@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="554.0" prefWidth="558.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainMenu.MenuController">
+   <children>
+      <TabPane layoutY="-2.0" prefHeight="556.0" prefWidth="603.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Battle">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="142.0" prefWidth="389.0" styleClass="anchor" stylesheets="@style.css">
+                     <children>
+                        <Button layoutX="302.0" layoutY="367.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="102.0" style="-fx-font-size: 25; -fx-font: Bold;" text="2 V 2">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Button>
+                        <Button layoutX="188.0" layoutY="366.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="107.0" style="-fx-font-size: 25;" text="Battle" />
+                        <ProgressBar layoutX="69.0" layoutY="21.0" prefHeight="20.0" prefWidth="123.0" progress="0.0" />
+                        <ImageView fitHeight="44.0" fitWidth="55.0" layoutX="14.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true" />
+                        <HBox layoutX="22.0" layoutY="58.0" prefHeight="61.0" prefWidth="382.0">
+                           <children>
+                              <ImageView fitHeight="61.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true" />
+                              <Label layoutX="64.0" layoutY="10.0" prefHeight="62.0" prefWidth="217.0" text="username">
+                                 <font>
+                                    <Font name="System Bold Italic" size="16.0" />
+                                 </font>
+                              </Label>
+                              <HBox prefHeight="61.0" prefWidth="34.0">
+                                 <children>
+                                    <ImageView fitHeight="61.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true" />
+                                 </children>
+                              </HBox>
+                              <Label prefHeight="61.0" prefWidth="75.0" style="-fx-font-size: 16; -fx-font-family: impact;" text="trophy">
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <Button layoutX="532.0" layoutY="2.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="73.0" style="-fx-font-size: 20;" text="Exit" />
+                        <ImageView fitHeight="232.0" fitWidth="258.0" layoutX="173.0" layoutY="126.0" pickOnBounds="true" preserveRatio="true">
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Cards">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="226.0" prefWidth="550.0">
+                     <children>
+                        <TabPane layoutX="14.0" layoutY="14.0" prefHeight="284.0" prefWidth="571.0" tabClosingPolicy="UNAVAILABLE">
+                          <tabs>
+                            <Tab text="1">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="125.0" prefWidth="539.0">
+                                       <children>
+                                          <ButtonBar prefHeight="112.0" prefWidth="573.0" style="-fx-background-color: white;">
+                                             <buttons>
+                                                <Button mnemonicParsing="false" prefHeight="118.0" prefWidth="231.0" />
+                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="118.0" />
+                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="117.0" />
+                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="119.0" />
+                                             </buttons>
+                                          </ButtonBar>
+                                          <ButtonBar layoutY="116.0" prefHeight="114.0" prefWidth="573.0" style="-fx-background-color: white;">
+                                             <buttons>
+                                                <Button mnemonicParsing="false" prefHeight="146.0" prefWidth="231.0" />
+                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="126.0" />
+                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="132.0" />
+                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="147.0" />
+                                             </buttons>
+                                          </ButtonBar>
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </Tab>
+                          </tabs>
+                        </TabPane>
+                        <ButtonBar layoutX="13.0" layoutY="370.0" prefHeight="114.0" prefWidth="573.0" style="-fx-background-color: white;">
+                           <buttons>
+                              <Button mnemonicParsing="false" prefHeight="146.0" prefWidth="231.0" />
+                              <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="126.0" />
+                              <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="132.0" />
+                              <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="147.0" />
+                           </buttons>
+                        </ButtonBar>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+            <Tab text="Camp">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="226.0" prefWidth="550.0">
+                     <children>
+                        <Button layoutX="117.0" layoutY="177.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="177.0" style="-fx-font-size: 25;" text="Normal Bot" fx:id="normalBotButton">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Button>
+                        <Button layoutX="302.0" layoutY="176.0" mnemonicParsing="false" prefHeight="76.0" prefWidth="170.0" style="-fx-font-size: 25; -fx-font-style: Bold;" text="Smart Bot">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>
