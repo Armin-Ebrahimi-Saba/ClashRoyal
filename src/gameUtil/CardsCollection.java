@@ -1,22 +1,26 @@
 package gameUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CardsCollection {
-    public ArrayList<Building> cannons = new ArrayList<>();
-    public ArrayList<Building> infernoTowers = new ArrayList<>();
-    public ArrayList<Troop> barbarians = new ArrayList<>();
-    public ArrayList<Troop> archers = new ArrayList<>();
-    public ArrayList<Troop> babyDragons = new ArrayList<>();
-    public ArrayList<Troop> wizards = new ArrayList<>();
-    public ArrayList<Troop> pekkas = new ArrayList<>();
-    public ArrayList<Troop> giants = new ArrayList<>();
-    public ArrayList<Troop> valkyries = new ArrayList<>();
-    public ArrayList<Spell> rages = new ArrayList<>();
-    public ArrayList<Spell> fireballs = new ArrayList<>();
-    public ArrayList<Spell> arrows = new ArrayList<>();
+    private static final ArrayList<Building> cannons = new ArrayList<>();
+    private static final ArrayList<Building> infernoTowers = new ArrayList<>();
+    private static final ArrayList<Building> kingTowers = new ArrayList<>();
+    private static final ArrayList<Building> archerTowers = new ArrayList<>();
+    private static final ArrayList<Troop> barbarians = new ArrayList<>();
+    private static final ArrayList<Troop> archers = new ArrayList<>();
+    private static final ArrayList<Troop> babyDragons = new ArrayList<>();
+    private static final ArrayList<Troop> wizards = new ArrayList<>();
+    private static final ArrayList<Troop> pekkas = new ArrayList<>();
+    private static final ArrayList<Troop> giants = new ArrayList<>();
+    private static final ArrayList<Troop> valkyries = new ArrayList<>();
+    private static final ArrayList<Spell> rages = new ArrayList<>();
+    private static final ArrayList<Spell> fireballs = new ArrayList<>();
+    private static final ArrayList<Spell> arrows = new ArrayList<>();
+    private static final ArrayList<ArrayList<Card>> collectionOfAllCards = new ArrayList<>();
 
-    {
+    static {
         cannons.add(new Building(
                 3,
                 Target.GROUND,
@@ -86,6 +90,77 @@ public class CardsCollection {
                 5.5,
                 BuildingName.CANNON,
                 "gameUtil/images/Troops/cannon.png"));
+
+        infernoTowers.add(new Building(
+                5,
+                Target.ANY,
+                "gameUtil/images/Cards/InfernoTowerCard.png",
+                "",
+                null,
+                800,
+                40,
+                20,
+                0.4,
+                6,
+                BuildingName.INFERNO_TOWER,
+                "gameUtil/images/Troops/infernoTower.png"));
+
+        infernoTowers.add(new Building(
+                5,
+                Target.ANY,
+                "gameUtil/images/Cards/InfernoTowerCard.png",
+                "",
+                null,
+                880,
+                40,
+                22,
+                0.4,
+                6,
+                BuildingName.INFERNO_TOWER,
+                "gameUtil/images/Troops/infernoTower.png"));
+
+
+        infernoTowers.add(new Building(
+                5,
+                Target.ANY,
+                "gameUtil/images/Cards/InfernoTowerCard.png",
+                "",
+                null,
+                968,
+                40,
+                24,
+                0.4,
+                6,
+                BuildingName.INFERNO_TOWER,
+                "gameUtil/images/Troops/infernoTower.png"));
+
+        infernoTowers.add(new Building(
+                5,
+                Target.ANY,
+                "gameUtil/images/Cards/InfernoTowerCard.png",
+                "",
+                null,
+                1064,
+                40,
+                26,
+                0.4,
+                6,
+                BuildingName.INFERNO_TOWER,
+                "gameUtil/images/Troops/infernoTower.png"));
+
+        infernoTowers.add(new Building(
+                5,
+                Target.ANY,
+                "gameUtil/images/Cards/InfernoTowerCard.png",
+                "",
+                null,
+                1168,
+                40,
+                29,
+                0.4,
+                6,
+                BuildingName.INFERNO_TOWER,
+                "gameUtil/images/Troops/infernoTower.png"));
 
         barbarians.add(new Troop(
                 5,
@@ -791,5 +866,201 @@ public class CardsCollection {
                 SpellName.RAGE,
                 5,
                 80));
+
+        archerTowers.add(new Building(
+                0,
+                Target.ANY,
+                "gameUtil/images/Cards/CannonCard.png",
+                "",
+                null,
+                1400,
+                Integer.MAX_VALUE,
+                50,
+                0.8,
+                7.5,
+                BuildingName.ARCHER_TOWER,
+                "gameUtil/images/Troops/archerTower.png"));
+
+        archerTowers.add(new Building(
+                0,
+                Target.ANY,
+                "gameUtil/images/Cards/CannonCard.png",
+                "",
+                null,
+                1512,
+                Integer.MAX_VALUE,
+                54,
+                0.8,
+                7.5,
+                BuildingName.ARCHER_TOWER,
+                "gameUtil/images/Troops/archerTower.png"));
+
+        archerTowers.add(new Building(
+                0,
+                Target.ANY,
+                "gameUtil/images/Cards/CannonCard.png",
+                "",
+                null,
+                1624,
+                Integer.MAX_VALUE,
+                58,
+                0.8,
+                7.5,
+                BuildingName.ARCHER_TOWER,
+                "gameUtil/images/Troops/archerTower.png"));
+
+        archerTowers.add(new Building(
+                0,
+                Target.ANY,
+                "gameUtil/images/Cards/CannonCard.png",
+                "",
+                null,
+                1750,
+                Integer.MAX_VALUE,
+                62,
+                0.8,
+                7.5,
+                BuildingName.ARCHER_TOWER,
+                "gameUtil/images/Troops/archerTower.png"));
+
+        archerTowers.add(new Building(
+                0,
+                Target.ANY,
+                "gameUtil/images/Cards/CannonCard.png",
+                "",
+                null,
+                1890,
+                Integer.MAX_VALUE,
+                69,
+                0.8,
+                7.5,
+                BuildingName.ARCHER_TOWER,
+                "gameUtil/images/Troops/archerTower.png"));
+
+
+        kingTowers.add(new Building(
+                0,
+                Target.ANY,
+                "gameUtil/images/Cards/CannonCard.png",
+                "",
+                null,
+                2400,
+                Integer.MAX_VALUE,
+                50,
+                0.8,
+                7,
+                BuildingName.KING_TOWER,
+                "gameUtil/images/Troops/kingTower.png"));
+
+        kingTowers.add(new Building(
+                0,
+                Target.ANY,
+                "gameUtil/images/Cards/CannonCard.png",
+                "",
+                null,
+                2568,
+                Integer.MAX_VALUE,
+                53,
+                0.8,
+                7,
+                BuildingName.KING_TOWER,
+                "gameUtil/images/Troops/kingTower.png"));
+
+        kingTowers.add(new Building(
+                0,
+                Target.ANY,
+                "gameUtil/images/Cards/CannonCard.png",
+                "",
+                null,
+                2736,
+                Integer.MAX_VALUE,
+                57,
+                0.8,
+                7,
+                BuildingName.KING_TOWER,
+                "gameUtil/images/Troops/kingTower.png"));
+
+        kingTowers.add(new Building(
+                0,
+                Target.ANY,
+                "gameUtil/images/Cards/CannonCard.png",
+                "",
+                null,
+                2904,
+                Integer.MAX_VALUE,
+                60,
+                0.8,
+                7,
+                BuildingName.KING_TOWER,
+                "gameUtil/images/Troops/kingTower.png"));
+
+        kingTowers.add(new Building(
+                0,
+                Target.ANY,
+                "gameUtil/images/Cards/CannonCard.png",
+                "",
+                null,
+                3096,
+                Integer.MAX_VALUE,
+                64,
+                0.8,
+                7,
+                BuildingName.KING_TOWER,
+                "gameUtil/images/Troops/kingTower.png"));
+
+        var lists = List.of(
+                cannons,
+                infernoTowers,
+                barbarians,
+                archers,
+                babyDragons,
+                wizards,
+                pekkas,
+                giants,
+                valkyries,
+                rages,
+                fireballs,
+                arrows,
+                archerTowers,
+                kingTowers);
+                lists.forEach(list -> collectionOfAllCards.add((ArrayList<Card>) list));
+
+        cannons.forEach(troop -> troop.setBuildingName(BuildingName.CANNON));
+        archerTowers.forEach(troop -> troop.setBuildingName(BuildingName.ARCHER_TOWER));
+        kingTowers.forEach(troop -> troop.setBuildingName(BuildingName.KING_TOWER));
+        infernoTowers.forEach(troop -> troop.setBuildingName(BuildingName.INFERNO_TOWER));
+        barbarians.forEach(troop -> troop.setTroopName(TroopName.BARBARIANS));
+        archers.forEach(troop -> troop.setTroopName(TroopName.ARCHER));
+        babyDragons.forEach(troop -> troop.setTroopName(TroopName.BABY_DRAGON));
+        wizards.forEach(troop -> troop.setTroopName(TroopName.WIZARD));
+        pekkas.forEach(troop -> troop.setTroopName(TroopName.PEKKA));
+        giants.forEach(troop -> troop.setTroopName(TroopName.GIANT));
+        valkyries.forEach(troop -> troop.setTroopName(TroopName.VALKYRIE));
+        rages.forEach(troop -> troop.setSpellName(SpellName.RAGE));
+        fireballs.forEach(troop -> troop.setSpellName(SpellName.FIRE_BALL));
+        arrows.forEach(troop -> troop.setSpellName(SpellName.ARROW));
+    }
+
+    /**
+     * return list of cards with indicated level
+     * @param level is the level of the cards
+     * @return return list of the cards at indicated level
+     */
+    public static ArrayList<Card> getCardSet(int level) {
+        ArrayList<Card> cards = new ArrayList<>();
+        for (int i = 0; i < 12; i++)
+            cards.add(collectionOfAllCards.get(i).get(level - 1));
+        return cards;
+    }
+
+    public static ArrayList<Building> getKingTowers() {
+        return kingTowers;
+    }
+
+    public static ArrayList<Building> getArcherTowers() {
+        return archerTowers;
     }
 }
+
+
+

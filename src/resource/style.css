@@ -1,0 +1,9 @@
+.AnchorPane{
+    -fx-background-image:url('/mainMenu/menuAssets/Tile_Background.jpg')
+}
+.buttonBar{
+    -fx-background-image: url('/mainMenu/menuAssets/Wood_Background.jpg');
+}
+.gameBackground{
+    -fx-background-image: url('/mainMenu/menuAssets/background.png');
+}

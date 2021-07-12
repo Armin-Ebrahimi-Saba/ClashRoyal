@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -13,11 +14,11 @@
 
 <AnchorPane prefHeight="554.0" prefWidth="558.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainMenu.MenuController">
    <children>
-      <TabPane layoutY="-2.0" prefHeight="556.0" prefWidth="603.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
+      <TabPane fx:id="mainMenuTabPane" layoutY="-2.0" prefHeight="556.0" prefWidth="603.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
         <tabs>
-          <Tab text="Battle">
+          <Tab fx:id="battleTab" text="Battle">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="142.0" prefWidth="389.0" styleClass="anchor" stylesheets="@style.css">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="142.0" prefWidth="389.0" styleClass="AnchorPane" stylesheets="/resource/style.css">
                      <children>
                         <Button layoutX="302.0" layoutY="367.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="102.0" style="-fx-font-size: 25; -fx-font: Bold;" text="2 V 2">
                            <font>
@@ -30,7 +31,7 @@
                         <HBox layoutX="22.0" layoutY="58.0" prefHeight="61.0" prefWidth="382.0">
                            <children>
                               <ImageView fitHeight="61.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true" />
-                              <Label layoutX="64.0" layoutY="10.0" prefHeight="62.0" prefWidth="217.0" text="username">
+                              <Label fx:id="usernameLabel" layoutX="64.0" layoutY="10.0" prefHeight="62.0" prefWidth="217.0" text="username">
                                  <font>
                                     <Font name="System Bold Italic" size="16.0" />
                                  </font>
@@ -40,7 +41,7 @@
                                     <ImageView fitHeight="61.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true" />
                                  </children>
                               </HBox>
-                              <Label prefHeight="61.0" prefWidth="75.0" style="-fx-font-size: 16; -fx-font-family: impact;" text="trophy">
+                              <Label fx:id="trophyLabel" prefHeight="61.0" prefWidth="75.0" style="-fx-font-size: 16; -fx-font-family: impact;" text="trophy">
                                  <font>
                                     <Font size="11.0" />
                                  </font>
@@ -49,35 +50,38 @@
                         </HBox>
                         <Button layoutX="532.0" layoutY="2.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="73.0" style="-fx-font-size: 20;" text="Exit" />
                         <ImageView fitHeight="232.0" fitWidth="258.0" layoutX="173.0" layoutY="126.0" pickOnBounds="true" preserveRatio="true">
-                        </ImageView>
+                           <image>
+                              <Image url="/mainMenu/menuAssets/Spooky_Town.png" />
+                           </image></ImageView>
+                        <Label fx:id="levelLabel" layoutX="32.0" layoutY="19.0" style="-fx-font-family: comic; -fx-font-weight: bold; -fx-font-size: 16;" text="12" />
                      </children>
                   </AnchorPane>
             </content>
           </Tab>
-          <Tab text="Cards">
+          <Tab fx:id="cardTab" text="Cards">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="226.0" prefWidth="550.0">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="226.0" prefWidth="550.0" styleClass="AnchorPane" stylesheets="/resource/style.css">
                      <children>
-                        <TabPane layoutX="14.0" layoutY="14.0" prefHeight="284.0" prefWidth="571.0" tabClosingPolicy="UNAVAILABLE">
+                        <TabPane layoutX="14.0" layoutY="14.0" prefHeight="307.0" prefWidth="571.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
                             <Tab text="1">
                               <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="125.0" prefWidth="539.0">
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="247.0" prefWidth="571.0">
                                        <children>
-                                          <ButtonBar prefHeight="112.0" prefWidth="573.0" style="-fx-background-color: white;">
+                                          <ButtonBar prefHeight="120.0" prefWidth="573.0" style="-fx-background-color: white;" styleClass="buttonBar" stylesheets="/resource/style.css">
                                              <buttons>
-                                                <Button mnemonicParsing="false" prefHeight="118.0" prefWidth="231.0" />
-                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="118.0" />
-                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="117.0" />
-                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="119.0" />
+                                                <Button fx:id="button1" mnemonicParsing="false" prefHeight="118.0" prefWidth="231.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                                                <Button fx:id="button2" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="118.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                                                <Button fx:id="button3" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="117.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                                                <Button fx:id="button4" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="119.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
                                              </buttons>
                                           </ButtonBar>
-                                          <ButtonBar layoutY="116.0" prefHeight="114.0" prefWidth="573.0" style="-fx-background-color: white;">
+                                          <ButtonBar layoutY="138.0" prefHeight="111.0" prefWidth="573.0" styleClass="buttonBar" stylesheets="/resource/style.css">
                                              <buttons>
-                                                <Button mnemonicParsing="false" prefHeight="146.0" prefWidth="231.0" />
-                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="126.0" />
-                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="132.0" />
-                                                <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="147.0" />
+                                                <Button fx:id="button6" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="126.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                                                <Button fx:id="button8" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="129.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                                                <Button fx:id="button5" mnemonicParsing="false" prefHeight="146.0" prefWidth="231.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                                                <Button fx:id="button7" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="132.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
                                              </buttons>
                                           </ButtonBar>
                                        </children>
@@ -86,23 +90,28 @@
                             </Tab>
                           </tabs>
                         </TabPane>
-                        <ButtonBar layoutX="13.0" layoutY="370.0" prefHeight="114.0" prefWidth="573.0" style="-fx-background-color: white;">
+                        <ButtonBar fx:id="buttonBar1" layoutX="15.0" layoutY="358.0" prefHeight="110.0" prefWidth="573.0" style="-fx-background-color: white;" styleClass="buttonBar" stylesheets="/resource/style.css">
                            <buttons>
-                              <Button mnemonicParsing="false" prefHeight="146.0" prefWidth="231.0" />
-                              <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="126.0" />
-                              <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="132.0" />
-                              <Button layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="147.0" />
+                              <Button fx:id="button9" mnemonicParsing="false" prefHeight="146.0" prefWidth="231.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                              <Button fx:id="button10" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="126.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                              <Button fx:id="button11" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="132.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                              <Button fx:id="button12" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="147.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
                            </buttons>
                         </ButtonBar>
+                        <Label layoutX="35.0" layoutY="330.0" prefHeight="28.0" prefWidth="144.0" style="-fx-font-weight: bold; -fx-font-size: 20; -fx-font-family: serif;" text="Card Collection">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Label>
                      </children>
                   </AnchorPane>
             </content>
           </Tab>
-            <Tab text="Camp">
+            <Tab fx:id="campTab" text="Camp">
                <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="226.0" prefWidth="550.0">
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="226.0" prefWidth="550.0" styleClass="AnchorPane" stylesheets="/resource/style.css">
                      <children>
-                        <Button layoutX="117.0" layoutY="177.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="177.0" style="-fx-font-size: 25;" text="Normal Bot" fx:id="normalBotButton">
+                        <Button fx:id="normalBotButton" layoutX="117.0" layoutY="177.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="177.0" style="-fx-font-size: 25;" text="Normal Bot">
                            <font>
                               <Font size="14.0" />
                            </font>

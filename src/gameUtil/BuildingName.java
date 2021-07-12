@@ -1,7 +1,10 @@
 package gameUtil;
 
-public enum BuildingName {
-    TOWER,
+import java.io.Serializable;
+
+public enum BuildingName implements Serializable {
+    ARCHER_TOWER,
     INFERNO_TOWER,
-    CANNON
+    CANNON,
+    KING_TOWER
 }

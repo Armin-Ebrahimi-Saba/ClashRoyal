@@ -11,16 +11,14 @@ import mainMenu.MenuController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import player.Status;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
-public class LoginController implements Initializable {
+public class LoginController {
 
     LoginModel loginModel;
     @FXML
@@ -34,27 +32,38 @@ public class LoginController implements Initializable {
     @FXML
     private ImageView logoImageView;
 
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    /**
+     * this method initialize the login controller and model and view
+     */
+    public void initialize() {
         loginModel = new LoginModel();
         logoImageView.setImage(new Image("login/images/logo.jpg"));
     }
 
+    /**
+     * this method exit the player from the exit button
+     * @param event is the event which mouse click on the exit button
+     */
     @FXML
     public void exit(ActionEvent event) {
         Platform.exit();
     }
 
+    /**
+     * this method login the player into game
+     * @param event is the event which is the mouse click
+     */
     @FXML
     public void login(ActionEvent event) {
+        Status retrievedData;
         try {
-
             if (usernameTextField.getText() != null &&
                 passwordField.getText() != null &&
-                loginModel.validateUsernameAndPassword(usernameTextField.getText(), passwordField.getText()))
+                (retrievedData = loginModel.validateUsernameAndPassword(usernameTextField.getText(), passwordField.getText())) != null)
             {
                 Stage stage = (Stage)this.loginButton.getScene().getWindow();
                 stage.close();
-                loginThePlayer();
+                loginThePlayer(retrievedData);
             } else {
                 warningLabel.setText("invalid username or password.");
             }
@@ -63,18 +72,22 @@ public class LoginController implements Initializable {
         }
     }
 
-    public void loginThePlayer() {
+    /**
+     *  login the player into game and show the main menu
+     * @param userData is the users' retrieved data
+     */
+    public void loginThePlayer(Status userData) {
         try {
             Stage playerStage = new Stage();
             FXMLLoader loader = new FXMLLoader();
             Pane root = (Pane) loader.load(getClass().getResource("/mainMenu/menu.fxml").openStream());
-            MenuController gameController = loader.getController();
+            MenuController menuController = loader.getController();
+            menuController.initialize(userData);
             Scene scene = new Scene(root);
             playerStage.setScene(scene);
             playerStage.setTitle("Clash Royal");
             playerStage.setResizable(false);
             playerStage.show();
-
         } catch (IOException ex) {
             ex.printStackTrace();
         }

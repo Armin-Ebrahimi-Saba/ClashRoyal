@@ -1,7 +1,8 @@
 package gameUtil;
 
-public enum Target {
-    AIR,
+import java.io.Serializable;
+
+public enum Target implements Serializable {
     GROUND,
     ANY
 }

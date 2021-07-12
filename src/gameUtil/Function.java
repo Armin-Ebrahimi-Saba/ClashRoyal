@@ -1,5 +1,7 @@
 package gameUtil;
 
-public interface Function {
+import java.io.Serializable;
+
+public interface Function extends Serializable {
         void execute();
 }

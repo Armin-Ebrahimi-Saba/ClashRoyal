@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="600.0" maxWidth="900.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="326.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="login.LoginController">
+<Pane maxHeight="600.0" maxWidth="900.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="326.0" prefWidth="900.0" styleClass="AnchorPane" stylesheets="@../resource/style.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="login.LoginController">
    <children>
       <Pane layoutX="-2.0" maxHeight="606.0" maxWidth="592.0" prefHeight="326.0" prefWidth="584.0" style="-fx-background-color: #0067cd;">
          <children>
@@ -20,22 +20,22 @@
             </ImageView>
          </children>
       </Pane>
-      <Label layoutX="609.0" layoutY="93.0" prefHeight="20.0" prefWidth="66.0" style="-fx-font-weight: bold;" text="Username">
+      <Label layoutX="609.0" layoutY="93.0" prefHeight="20.0" prefWidth="66.0" style="-fx-font-weight: bold; -fx-font-family: serif; -fx-font-size: 15;" text="Username">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <TextField fx:id="usernameTextField" layoutX="686.0" layoutY="90.0" prefHeight="25.0" prefWidth="187.0" promptText="username">
+      <TextField fx:id="usernameTextField" layoutX="686.0" layoutY="90.0" prefHeight="25.0" prefWidth="187.0" promptText="username" style="-fx-font-family: serif; -fx-font-size: 14;">
          <font>
             <Font size="13.0" />
          </font>
       </TextField>
-      <Label layoutX="609.0" layoutY="134.0" prefHeight="20.0" prefWidth="66.0" style="-fx-font-weight: bold;" text="Password">
+      <Label layoutX="609.0" layoutY="134.0" prefHeight="20.0" prefWidth="66.0" style="-fx-font-weight: bold; -fx-font-family: serif; -fx-font-size: 15;" text="Password">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <PasswordField fx:id="passwordField" layoutX="686.0" layoutY="131.0" prefHeight="25.0" prefWidth="187.0" promptText="password">
+      <PasswordField fx:id="passwordField" layoutX="686.0" layoutY="131.0" prefHeight="25.0" prefWidth="187.0" promptText="password" style="-fx-font-family: serif; -fx-font-size: 14;">
          <font>
             <Font size="13.0" />
          </font></PasswordField>
@@ -48,7 +48,7 @@
             <Font size="31.0" />
          </font>
       </Label>
-      <Label fx:id="warningLabel" alignment="CENTER" layoutX="631.0" layoutY="163.0" prefHeight="17.0" prefWidth="242.0" textFill="#514f4f">
+      <Label fx:id="warningLabel" alignment="CENTER" layoutX="628.0" layoutY="293.0" prefHeight="17.0" prefWidth="242.0" textFill="#514f4f">
          <font>
             <Font size="13.0" />
          </font>

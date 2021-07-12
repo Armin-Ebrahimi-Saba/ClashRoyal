@@ -1,6 +1,8 @@
 package gameUtil;
 
-public abstract class Card {
+import java.io.Serializable;
+
+public abstract class Card implements Serializable {
     // cost is the elixir price of the card
     // target is the target type of the card
     // cardImageAddress is address of the image
@@ -77,4 +79,12 @@ public abstract class Card {
      * @return sight range of the character
      */
     public abstract double getRange();
+
+    /**
+     * this is a getter
+     * @return the address for the card image
+     */
+    public String getCardAddress() {
+        return cardAddress;
+    }
 }

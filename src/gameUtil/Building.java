@@ -1,12 +1,14 @@
 package gameUtil;
 
-public class Building extends Card{
+import java.io.Serializable;
+
+public class Building extends Card implements Serializable {
     private final int HP;
     private final int lifeTime;
     private final double hitSpeed;
     private final double range;
     private int damage;
-    private final BuildingName buildingName;
+    private BuildingName buildingName;
 
 
     /**
@@ -86,5 +88,9 @@ public class Building extends Card{
 
     public BuildingName getBuildingName() {
         return buildingName;
+    }
+
+    public void setBuildingName(BuildingName buildingName) {
+        this.buildingName = buildingName;
     }
 }

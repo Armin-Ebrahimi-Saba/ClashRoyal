@@ -1,6 +1,8 @@
 package gameUtil;
 
-public class Troop extends Card {
+import java.io.Serializable;
+
+public class Troop extends Card implements Serializable {
     private boolean isAreaSplash;
     private int range;
     private int count;
@@ -82,5 +84,13 @@ public class Troop extends Card {
     @Override
     public double getRange() {
         return range;
+    }
+
+    /**
+     * this method is a setter
+     * @param troopName this is name of the troop
+     */
+    public void setTroopName(TroopName troopName) {
+        this.troopName = troopName;
     }
 }

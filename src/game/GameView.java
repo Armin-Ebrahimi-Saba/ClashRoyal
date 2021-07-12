@@ -1,27 +1,41 @@
 package game;
 
-import com.sun.javafx.geom.Point2D;
 import gameUtil.AliveTroop;
+import gameUtil.Building;
+import gameUtil.BuildingName;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 
-public class GameView extends Group {
+public class GameView extends Pane {
+    private GameModel gameModel;
     private ImageView[][] firstLayerCellViews;
     private ArrayList<ImageView> secondLayerCellViews;
-    private AnchorPane secondLayerPane;
+//    private AnchorPane secondLayerPane;
     private int CELL_WIDTH = 10;
     private int rowCount = 20;
     private int columnCount = 20;
-
+    private Label label = new Label("hello mother fucker ");
 
     /**
      * this is a constructor
      */
     public GameView() {
+    }
+
+    /**
+     * this method initialize the view
+     */
+    public void initialize(GameModel gameModel) {
+        this.gameModel = gameModel;
+//        secondLayerCellViews.forEach((view) -> this.getChildren().add(view));
+//        this.getChildren().add(secondLayerCellViews);
         initializeFirstLayerGrid();
         initializeSecondLayerGrid();
     }
@@ -30,11 +44,9 @@ public class GameView extends Group {
      * Constructs an empty grid of ImageViews
      */
     private void initializeSecondLayerGrid() {
-        secondLayerPane = new AnchorPane();
-        secondLayerPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.0)");
-        this.getChildren().add(secondLayerPane);
+//        secondLayerPane = new AnchorPane();
+//        this.getChildren().add(secondLayerPane);
         secondLayerCellViews = new ArrayList<>(15);
-        // TODO you must add this cell views to the second layer
     }
 
     /**
@@ -50,7 +62,7 @@ public class GameView extends Group {
                 imageView.setFitWidth(CELL_WIDTH);
                 imageView.setFitHeight(CELL_WIDTH);
                 firstLayerCellViews[row][column] = imageView;
-                this.getChildren().add(imageView);
+                //this.getChildren().add(imageView);
             }
         }
     }
@@ -61,27 +73,43 @@ public class GameView extends Group {
     public void update(GameModel model) {
         secondLayerCellViews.clear();
         for (var status : model.getPlayersStatus()) {
-            for (var troop : status.getAliveTroops()) {
+            for (var troop : status.getAliveAllyTroops()) {
                 if (troop.isAlive())
-                    secondLayerCellViews.add(creatImageView(troop));
+                {
+                    var imageView = creatImageView(troop);
+                    secondLayerCellViews.add(imageView);
+                    this.getChildren().add(imageView);
+                }
             }
         }
-        secondLayerCellViews.forEach(
-                cv -> secondLayerPane.getChildren().add(cv));
+//        secondLayerCellViews.forEach(
+//                cv -> secondLayerPane.getChildren().add(cv));
     }
 
     /**
-     * this method creats an imageView
+     * this method creates an imageView
      * @param troop is the troop which its imageView will rotate
      * @return the imageView which was built
      */
     private ImageView creatImageView(AliveTroop troop) {
         ImageView imageView = new ImageView();
-        Image image = new Image(getClass().getResourceAsStream(troop.getCard().getCharacterImageAddress()));
+        System.out.println(troop.getCard().getCharacterImageAddress());
+        Image image = new Image(troop.getCard().getCharacterImageAddress());
         imageView.setImage(image);
-        imageView.setX(troop.getTroopLocation().x);
-        imageView.setY(troop.getTroopLocation().y);
-        rotateImageView(troop.getTroopVelocity(), imageView);
+        imageView.setX(troop.getTroopLocation().getX());
+        imageView.setY(troop.getTroopLocation().getY());
+        if (troop.getTroopVelocity() != null)
+            rotateImageView(troop.getTroopVelocity(), imageView);
+        if (troop.getCard().getName() != BuildingName.ARCHER_TOWER &&
+            troop.getCard().getName() != BuildingName.KING_TOWER) {
+            imageView.setFitWidth(50);
+            imageView.setFitHeight(50);
+            imageView.setPreserveRatio(true);
+        } else {
+            imageView.setFitWidth(80);
+            imageView.setFitHeight(80);
+            imageView.setPreserveRatio(true);
+        }
         return imageView;
     }
 
@@ -92,12 +120,12 @@ public class GameView extends Group {
      */
     private void rotateImageView(Point2D direction, ImageView imageView) {
         double degree;
-        degree = Math.abs(Math.atan(direction.y/ (direction.x + 0.0000001231)) / Math.PI) * 180;
-        if (direction.y >= 0 && direction.x < 0)
+        degree = Math.abs(Math.atan(direction.getY()/ (direction.getX() + 0.0000001231)) / Math.PI) * 180;
+        if (direction.getY() >= 0 && direction.getX() < 0)
             degree = -degree;
-        else if (direction.y <= 0 && direction.x > 0)
+        else if (direction.getY() <= 0 && direction.getX() > 0)
             degree = 180 - degree;
-        else if (direction.y <= 0 && direction.x < 0)
+        else if (direction.getY() <= 0 && direction.getX() < 0)
             degree -= 180;
         imageView.setRotate(degree);
     }

@@ -1,9 +1,11 @@
 package gameUtil;
 
-import com.sun.javafx.geom.Point2D;
+import javafx.geometry.Point2D;
 import game.GameController;
 
-public class AliveTroop {
+import java.io.Serializable;
+
+public class AliveTroop implements Serializable {
     // indicates the location of the troop
     // indicates the velocity of the troop
     // is the card which this troop is related to
@@ -23,10 +25,11 @@ public class AliveTroop {
      * this is constructor
      * @param card  is the card which is indicated to this alive troop
      */
-    public AliveTroop(Card card) {
+    public AliveTroop(Card card, Point2D initialLocation) {
         this.card = card;
         this.HP = card.getHP();
         this.timeLeft = card.getDamage() * 100;
+        this.troopLocation = initialLocation;
     }
 
     /**
@@ -128,8 +131,7 @@ public class AliveTroop {
      * this method move the alive troop
      */
     public void move() {
-        troopLocation.x += troopVelocity.x;
-        troopLocation.y += troopVelocity.y;
+        troopLocation.add(troopVelocity);
     }
 
     /**
@@ -145,7 +147,7 @@ public class AliveTroop {
      * @return damage of the troop
      */
     public double getDamage() {
-        if (booster.isDurationFinished()) {
+        if (booster != null && booster.isDurationFinished()) {
             return card.getDamage();
         }
         return card.getDamage() * 1.4;

@@ -1,6 +1,8 @@
 package gameUtil;
 
-public enum TroopName {
+import java.io.Serializable;
+
+public enum TroopName implements Serializable {
     GIANT,
     VALKYRIE,
     BARBARIANS,
