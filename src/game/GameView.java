@@ -1,11 +1,9 @@
 package game;
 
 import gameUtil.AliveTroop;
-import gameUtil.Building;
 import gameUtil.BuildingName;
+import javafx.animation.TranslateTransition;
 import javafx.geometry.Point2D;
-import javafx.scene.Group;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,7 +19,6 @@ public class GameView extends Pane {
     private int CELL_WIDTH = 10;
     private int rowCount = 20;
     private int columnCount = 20;
-    private Label label = new Label("hello mother fucker ");
 
     /**
      * this is a constructor
@@ -46,7 +43,7 @@ public class GameView extends Pane {
     private void initializeSecondLayerGrid() {
 //        secondLayerPane = new AnchorPane();
 //        this.getChildren().add(secondLayerPane);
-        secondLayerCellViews = new ArrayList<>(15);
+        secondLayerCellViews = new ArrayList<>(30);
     }
 
     /**
@@ -71,15 +68,23 @@ public class GameView extends Pane {
      * this method updates the view
      */
     public void update(GameModel model) {
+        System.out.println(model.getPlayersStatus()[0].getAliveAllyTroops());
         secondLayerCellViews.clear();
-        for (var status : model.getPlayersStatus()) {
-            for (var troop : status.getAliveAllyTroops()) {
-                if (troop.isAlive())
-                {
-                    var imageView = creatImageView(troop);
-                    secondLayerCellViews.add(imageView);
-                    this.getChildren().add(imageView);
-                }
+        this.getChildren().clear();
+        for (var troop : model.getPlayersStatus()[0].getAliveEnemyTroops()) {
+            if (troop.isAlive())
+            {
+                var imageView = creatImageView(troop);
+                secondLayerCellViews.add(imageView);
+                this.getChildren().add(imageView);
+            }
+        }
+        for (var troop : model.getPlayersStatus()[0].getAliveAllyTroops()) {
+            if (troop.isAlive())
+            {
+                var imageView = creatImageView(troop);
+                secondLayerCellViews.add(imageView);
+                this.getChildren().add(imageView);
             }
         }
 //        secondLayerCellViews.forEach(
@@ -93,13 +98,16 @@ public class GameView extends Pane {
      */
     private ImageView creatImageView(AliveTroop troop) {
         ImageView imageView = new ImageView();
-        System.out.println(troop.getCard().getCharacterImageAddress());
         Image image = new Image(troop.getCard().getCharacterImageAddress());
         imageView.setImage(image);
-        imageView.setX(troop.getTroopLocation().getX());
-        imageView.setY(troop.getTroopLocation().getY());
-        if (troop.getTroopVelocity() != null)
-            rotateImageView(troop.getTroopVelocity(), imageView);
+        System.out.print(troop.getCard().getName() + ": ");
+        System.out.println(troop.getTroopLocation());
+        imageView.setLayoutX(troop.getTroopLocation().getX());
+        imageView.setLayoutY(troop.getTroopLocation().getY());
+        imageView.setSmooth(true);
+        imageView.setCache(true);
+        if (troop.getTroopVelocityDirection() != null)
+            rotateImageView(troop.getTroopVelocityDirection(), imageView);
         if (troop.getCard().getName() != BuildingName.ARCHER_TOWER &&
             troop.getCard().getName() != BuildingName.KING_TOWER) {
             imageView.setFitWidth(50);
@@ -119,14 +127,14 @@ public class GameView extends Pane {
      * @param imageView is the image view which should be rotated
      */
     private void rotateImageView(Point2D direction, ImageView imageView) {
-        double degree;
-        degree = Math.abs(Math.atan(direction.getY()/ (direction.getX() + 0.0000001231)) / Math.PI) * 180;
-        if (direction.getY() >= 0 && direction.getX() < 0)
-            degree = -degree;
-        else if (direction.getY() <= 0 && direction.getX() > 0)
-            degree = 180 - degree;
-        else if (direction.getY() <= 0 && direction.getX() < 0)
-            degree -= 180;
+        double degree = direction.angle(0, -1);
+//        degree = Math.abs(Math.atan(direction.getY()/ (direction.getX() + 0.0000001231)) / Math.PI) * 180;
+//        if (direction.getY() >= 0 && direction.getX() < 0)
+//            degree = -degree;
+//        else if (direction.getY() <= 0 && direction.getX() > 0)
+//            degree = 180 - degree;
+//        else if (direction.getY() <= 0 && direction.getX() < 0)
+//            degree -= 180;
         imageView.setRotate(degree);
     }
 }

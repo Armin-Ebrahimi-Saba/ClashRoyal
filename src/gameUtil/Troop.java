@@ -93,4 +93,12 @@ public class Troop extends Card implements Serializable {
     public void setTroopName(TroopName troopName) {
         this.troopName = troopName;
     }
+
+    /**
+     * this method is a getter
+     * @return count of this type troop
+     */
+    public int getCount() {
+        return count;
+    }
 }

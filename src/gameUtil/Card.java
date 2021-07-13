@@ -87,4 +87,12 @@ public abstract class Card implements Serializable {
     public String getCardAddress() {
         return cardAddress;
     }
+
+    /**
+     * this method is a getter
+     * @return cost of this card
+     */
+    public int getCost() {
+        return cost;
+    }
 }

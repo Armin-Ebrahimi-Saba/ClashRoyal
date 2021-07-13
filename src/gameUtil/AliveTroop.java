@@ -13,7 +13,7 @@ public class AliveTroop implements Serializable {
     // is the time left for the spell of rage or a building like cannon or inferno tower
     // is the booster of this troop which is a rage troop
     private Point2D troopLocation;
-    private Point2D troopVelocity;
+    private Point2D troopVelocityDirection;
     private final Card card;
     private int HP;
     private boolean isEngaged;
@@ -42,10 +42,10 @@ public class AliveTroop implements Serializable {
 
     /**
      * this is a setter
-     * @param troopVelocity is the velocity of troops
+     * @param troopVelocityDirection is the velocity of troops
      */
-    public void setTroopVelocity(Point2D troopVelocity) {
-        this.troopVelocity = troopVelocity;
+    public void setTroopVelocityDirection(Point2D troopVelocityDirection) {
+        this.troopVelocityDirection = troopVelocityDirection;
     }
 
     /**
@@ -58,8 +58,8 @@ public class AliveTroop implements Serializable {
     /**
      * this is a getter which returns velocity of the troop
      */
-    public Point2D getTroopVelocity() {
-        return troopVelocity;
+    public Point2D getTroopVelocityDirection() {
+        return troopVelocityDirection;
     }
 
     /**
@@ -131,7 +131,8 @@ public class AliveTroop implements Serializable {
      * this method move the alive troop
      */
     public void move() {
-        troopLocation.add(troopVelocity);
+        if (card instanceof Troop)
+            troopLocation.add(troopVelocityDirection.multiply(((Troop)card).getSpeed()));
     }
 
     /**

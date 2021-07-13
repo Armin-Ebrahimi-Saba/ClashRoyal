@@ -100,7 +100,7 @@ public class MenuController {
                     FXMLLoader loader = new FXMLLoader();
                     Pane root = loader.load(getClass().getResource("/game/game.fxml").openStream());
                     GameController gameController = loader.getController();
-                    gameController.initialize(menuModel.getStatus(), menuModel.getStatus());
+                    gameController.initialize(menuModel.getStatus(), new Status("EasyBot"));
                     Scene scene = new Scene(root);
                     playerStage.setScene(scene);
                     playerStage.setTitle("Clash Royal");

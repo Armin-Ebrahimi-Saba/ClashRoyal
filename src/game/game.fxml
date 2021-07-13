@@ -16,7 +16,7 @@
          <buttons>
             <Button fx:id="card1Button" mnemonicParsing="false" prefHeight="102.0" prefWidth="125.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
             <Button fx:id="card2Button" mnemonicParsing="false" prefHeight="104.0" prefWidth="107.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-          <Button fx:id="card3Button" mnemonicParsing="false" prefHeight="104.0" prefWidth="107.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+            <Button fx:id="card3Button" mnemonicParsing="false" prefHeight="104.0" prefWidth="107.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
             <Button fx:id="card4Button" mnemonicParsing="false" prefHeight="104.0" prefWidth="189.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
          </buttons>
       </ButtonBar>

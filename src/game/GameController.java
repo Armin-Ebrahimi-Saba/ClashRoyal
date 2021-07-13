@@ -1,6 +1,7 @@
 package game;
 
 import gameUtil.AliveTroop;
+import gameUtil.Troop;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -56,6 +57,33 @@ public class GameController implements EventHandler<MouseEvent> {
      * this method initialize game
      */
     public void initialize(Status status1, Status status2) {
+        Thread thread = new Thread(() -> {
+            int time = 180;
+            int counter1 = 0;
+            int counter2 = 0;
+            while (time > 0) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (counter1 == 2) {
+                    status1.increaseElixirs();
+                    counter1 = 0;
+                }
+                if (counter2 == 2) {
+                    status2.increaseElixirs();
+                    counter2 = 0;
+                }
+                if (status1.getElixirs() < 10)
+                    counter1++;
+                if (status2.getElixirs() < 10)
+                    counter2++;
+                time--;
+            }
+//            indicateTheWinner();
+        });
+        thread.start();
         secondLayerPane = new AnchorPane();
         secondLayerPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.0)");
         gameModel = new GameModel();
@@ -111,12 +139,14 @@ public class GameController implements EventHandler<MouseEvent> {
         if (mouseEvent.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
             if (gameModel.getStackedButton() != null &&
                 gameModel.getStackedCard() != null &&
-                gameModel.isValidCoordination(mouseLocation))
+                GameModel.isValidCoordination(mouseLocation))
             {
                 var cardDeskInUse = gameModel.getPlayersStatus()[0].getCardsDeskInUse();
                 var aliveAllyTroops = gameModel.getPlayersStatus()[0].getAliveAllyTroops();
-                aliveAllyTroops.add(new AliveTroop(gameModel.getStackedCard(), mouseLocation));
-                cardDeskInUse.remove(gameModel.getStackedCard());
+                var stackedCard = gameModel.getStackedCard();
+                for (int i = 0; i < (stackedCard instanceof Troop ? ((Troop)stackedCard).getCount() : 1); i++)
+                    aliveAllyTroops.add(new AliveTroop(gameModel.getStackedCard(), mouseLocation));
+                cardDeskInUse.remove(stackedCard);
                 cardDeskInUse.add(0, gameModel.getStackedCard());
                 for (int i = 0; i < 4; i++)
                     setButtonImage(listedButtons.get(i), cardDeskInUse.get(4 + i).getCardAddress());
@@ -137,7 +167,7 @@ public class GameController implements EventHandler<MouseEvent> {
                 Platform.runLater(() -> update());
             }
         };
-        GameController.frameTimeInMilliseconds = (long)(1000.0 / FRAMES_PER_SECOND);
+        frameTimeInMilliseconds = (long)(1000.0 / FRAMES_PER_SECOND);
         this.timer.schedule(timerTask, 0, frameTimeInMilliseconds);
     }
 
