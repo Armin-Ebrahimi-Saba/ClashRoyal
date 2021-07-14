@@ -4,6 +4,7 @@ import javafx.geometry.Point2D;
 import game.GameController;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class AliveTroop implements Serializable {
     // indicates the location of the troop
@@ -17,7 +18,7 @@ public class AliveTroop implements Serializable {
     private final Card card;
     private int HP;
     private boolean isEngaged;
-    private AliveTroop engagedEnemy;
+    private ArrayList<AliveTroop> inRangeEnemies;
     private double timeLeft;
     private AliveTroop booster;
 
@@ -74,7 +75,7 @@ public class AliveTroop implements Serializable {
      * this method reduce the HP of the troop
      * @param damage is the damage done to the troop
      */
-    public void reduceHP(int damage) {
+    public void reduceHP(double damage) {
         HP -= damage;
     }
 
@@ -90,16 +91,16 @@ public class AliveTroop implements Serializable {
      * this is a getter
      * @return the troop which this troop is engaged with
      */
-    public AliveTroop getEngagedEnemy() {
-        return engagedEnemy;
+    public ArrayList<AliveTroop> getInRangeEnemies() {
+        return inRangeEnemies;
     }
 
     /**
      * this method is a setter
-     * @param engagedEnemy set the engaged enemy
+     * @param inRangeEnemies set the engaged enemy
      */
-    public void setEngagedEnemy(AliveTroop engagedEnemy) {
-        this.engagedEnemy = engagedEnemy;
+    public void setInRangeEnemies(ArrayList<AliveTroop> inRangeEnemies) {
+        this.inRangeEnemies = inRangeEnemies;
         switchAttackCondition();
     }
 
@@ -131,8 +132,12 @@ public class AliveTroop implements Serializable {
      * this method move the alive troop
      */
     public void move() {
-        if (card instanceof Troop)
-            troopLocation.add(troopVelocityDirection.multiply(((Troop)card).getSpeed()));
+        if (card instanceof Troop && !isEngaged) {
+            double x = troopLocation.getX();
+            double y = troopLocation.getY();
+            var speed = troopVelocityDirection.multiply(((Troop) card).getSpeed() * 0.7);
+            troopLocation = new Point2D(x + speed.getX(), y + speed.getY());
+        }
     }
 
     /**

@@ -18,7 +18,7 @@
         <tabs>
           <Tab fx:id="battleTab" text="Battle">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="142.0" prefWidth="389.0" styleClass="AnchorPane" stylesheets="/resource/style.css">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="142.0" prefWidth="389.0" styleClass="AnchorPane" stylesheets="/mainMenu/style.css">
                      <children>
                         <Button layoutX="302.0" layoutY="367.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="102.0" style="-fx-font-size: 25; -fx-font: Bold;" text="2 V 2">
                            <font>
@@ -60,7 +60,7 @@
           </Tab>
           <Tab fx:id="cardTab" text="Cards">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="226.0" prefWidth="550.0" styleClass="AnchorPane" stylesheets="/resource/style.css">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="226.0" prefWidth="550.0" styleClass="AnchorPane" stylesheets="/mainMenu/style.css">
                      <children>
                         <TabPane layoutX="14.0" layoutY="14.0" prefHeight="307.0" prefWidth="571.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
@@ -68,20 +68,20 @@
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="247.0" prefWidth="571.0">
                                        <children>
-                                          <ButtonBar prefHeight="120.0" prefWidth="573.0" style="-fx-background-color: white;" styleClass="buttonBar" stylesheets="/resource/style.css">
+                                          <ButtonBar prefHeight="120.0" prefWidth="573.0" style="-fx-background-color: white;" styleClass="buttonBar" stylesheets="/mainMenu/style.css">
                                              <buttons>
-                                                <Button fx:id="button1" mnemonicParsing="false" prefHeight="118.0" prefWidth="231.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-                                                <Button fx:id="button2" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="118.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-                                                <Button fx:id="button3" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="117.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-                                                <Button fx:id="button4" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="119.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                                                <Button fx:id="button1" mnemonicParsing="false" prefHeight="118.0" prefWidth="231.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+                                                <Button fx:id="button2" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="118.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+                                                <Button fx:id="button3" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="117.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+                                                <Button fx:id="button4" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="119.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
                                              </buttons>
                                           </ButtonBar>
-                                          <ButtonBar layoutY="138.0" prefHeight="111.0" prefWidth="573.0" styleClass="buttonBar" stylesheets="/resource/style.css">
+                                          <ButtonBar layoutY="138.0" prefHeight="111.0" prefWidth="573.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css">
                                              <buttons>
-                                                <Button fx:id="button6" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="126.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-                                                <Button fx:id="button8" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="129.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-                                                <Button fx:id="button5" mnemonicParsing="false" prefHeight="146.0" prefWidth="231.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-                                                <Button fx:id="button7" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="132.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                                                <Button fx:id="button6" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="126.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+                                                <Button fx:id="button8" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="129.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+                                                <Button fx:id="button5" mnemonicParsing="false" prefHeight="146.0" prefWidth="231.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+                                                <Button fx:id="button7" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="132.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
                                              </buttons>
                                           </ButtonBar>
                                        </children>
@@ -90,12 +90,12 @@
                             </Tab>
                           </tabs>
                         </TabPane>
-                        <ButtonBar fx:id="buttonBar1" layoutX="15.0" layoutY="358.0" prefHeight="110.0" prefWidth="573.0" style="-fx-background-color: white;" styleClass="buttonBar" stylesheets="/resource/style.css">
+                        <ButtonBar fx:id="buttonBar1" layoutX="15.0" layoutY="358.0" prefHeight="110.0" prefWidth="573.0" style="-fx-background-color: white;" styleClass="buttonBar" stylesheets="/mainMenu/style.css">
                            <buttons>
-                              <Button fx:id="button9" mnemonicParsing="false" prefHeight="146.0" prefWidth="231.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-                              <Button fx:id="button10" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="126.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-                              <Button fx:id="button11" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="132.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-                              <Button fx:id="button12" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="147.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+                              <Button fx:id="button9" mnemonicParsing="false" prefHeight="146.0" prefWidth="231.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+                              <Button fx:id="button10" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="126.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+                              <Button fx:id="button11" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="132.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+                              <Button fx:id="button12" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="147.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
                            </buttons>
                         </ButtonBar>
                         <Label layoutX="35.0" layoutY="330.0" prefHeight="28.0" prefWidth="144.0" style="-fx-font-weight: bold; -fx-font-size: 20; -fx-font-family: serif;" text="Card Collection">
@@ -109,7 +109,7 @@
           </Tab>
             <Tab fx:id="campTab" text="Camp">
                <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="226.0" prefWidth="550.0" styleClass="AnchorPane" stylesheets="/resource/style.css">
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="226.0" prefWidth="550.0" styleClass="AnchorPane" stylesheets="/mainMenu/style.css">
                      <children>
                         <Button fx:id="normalBotButton" layoutX="117.0" layoutY="177.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="177.0" style="-fx-font-size: 25;" text="Normal Bot">
                            <font>

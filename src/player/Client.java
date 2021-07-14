@@ -1,13 +1,12 @@
 package player;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.Socket;
 
-public class Client {
+public class Client extends Player {
     private final Status status;
     private BufferedReader reader;
-    private OutputStream outputStream;
+    private OutputStream out;
 
     /**
      * this is a constructor
@@ -15,6 +14,20 @@ public class Client {
      */
     public Client(Status status) {
         this.status = status;
+    }
+
+    /** this is the main method the class which is used for running a client server. */
+    public static void main(String[] args) {
+        Client client = new Client(null);
+        try (Socket connectionSocket = new Socket("127.0.0.1", 7660)) {
+            InputStream in = connectionSocket.getInputStream();
+            client.out = connectionSocket.getOutputStream();
+            client.reader = new BufferedReader(new InputStreamReader(in));
+            client.startMessageListener();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        ;
     }
 
     /**
@@ -61,7 +74,7 @@ public class Client {
      */
     public void writeMessage(String message) {
         try {
-            outputStream.write((message + "\n").getBytes());
+            out.write((message + "\n").getBytes());
         } catch(IOException ex) {
             ex.printStackTrace();
         }

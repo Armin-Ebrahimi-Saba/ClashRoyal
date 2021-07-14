@@ -66,6 +66,15 @@ public class Spell extends Card implements Serializable {
     }
 
     /**
+     * this method checks if troop is area splash
+     * @return true if it is area splash else false
+     */
+    @Override
+    public boolean isAreaSplash() {
+        return false;
+    }
+
+    /**
      * this method is a setter
      * @param spellName is the spellName which will be assign to this spell
      */

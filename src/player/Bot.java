@@ -6,7 +6,7 @@ import javafx.geometry.Point2D;
 
 import java.util.Random;
 
-public class Bot {
+public class Bot extends Player {
     private Status status;
     private boolean isSmart;
     private boolean isConnectedToGame = false;

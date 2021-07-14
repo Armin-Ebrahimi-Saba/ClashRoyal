@@ -2,9 +2,14 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 
-<AnchorPane fx:id="firstLayer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="759.0" prefWidth="427.0" styleClass="gameBackground" stylesheets="/resource/style.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="game.GameController">
+<AnchorPane fx:id="firstLayer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="759.0" prefWidth="427.0" styleClass="gameBackground" stylesheets="/mainMenu/style.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="game.GameController">
    <children>
       <Button fx:id="tower4" layoutX="330.0" layoutY="123.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="83.0" style="-fx-background-color: rgba(0, 0, 0, 0.0);" />
       <Button fx:id="king2" layoutX="172.0" layoutY="22.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="83.0" style="-fx-background-color: rgba(0, 0, 0, 0.0);" />
@@ -12,14 +17,40 @@
       <Button fx:id="tower1" layoutX="21.0" layoutY="473.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="83.0" style="-fx-background-color: rgba(0, 0, 0, 0.0);" />
       <Button fx:id="king1" layoutX="166.0" layoutY="567.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="83.0" style="-fx-background-color: rgba(0, 0, 0, 0.0);" />
       <Button fx:id="tower2" layoutX="324.0" layoutY="473.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="83.0" style="-fx-background-color: rgba(0, 0, 0, 0.0);" />
-      <ButtonBar layoutX="-3.0" layoutY="655.0" prefHeight="102.0" prefWidth="427.0" styleClass="buttonBar" stylesheets="/resource/style.css">
+      <ButtonBar layoutX="74.0" layoutY="654.0" prefHeight="80.0" prefWidth="350.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css">
          <buttons>
-            <Button fx:id="card1Button" mnemonicParsing="false" prefHeight="102.0" prefWidth="125.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-            <Button fx:id="card2Button" mnemonicParsing="false" prefHeight="104.0" prefWidth="107.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-            <Button fx:id="card3Button" mnemonicParsing="false" prefHeight="104.0" prefWidth="107.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
-            <Button fx:id="card4Button" mnemonicParsing="false" prefHeight="104.0" prefWidth="189.0" styleClass="buttonBar" stylesheets="/resource/style.css" />
+            <Button fx:id="card1Button" minWidth="62.0" mnemonicParsing="false" prefHeight="81.0" prefWidth="125.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+            <Button fx:id="card2Button" mnemonicParsing="false" prefHeight="104.0" prefWidth="107.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+            <Button fx:id="card3Button" mnemonicParsing="false" prefHeight="104.0" prefWidth="107.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
+            <Button fx:id="card4Button" mnemonicParsing="false" prefHeight="104.0" prefWidth="189.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
          </buttons>
       </ButtonBar>
-      <AnchorPane fx:id="secondLayerPane" layoutX="-1.0" layoutY="-1.0" prefHeight="656.0" prefWidth="427.0" />
+      <AnchorPane fx:id="secondLayerPane" layoutX="-1.0" layoutY="-1.0" prefHeight="656.0" prefWidth="427.0">
+         <children>
+            <Pane layoutX="358.0" prefHeight="52.0" prefWidth="69.0">
+               <children>
+                  <Label layoutX="3.0" layoutY="6.0" prefHeight="17.0" prefWidth="64.0" style="-fx-font-size: 11; -fx-font-weight: bold;" text="TIME LEFT:" />
+                  <Label fx:id="timerLabel" layoutX="19.0" layoutY="23.0" prefHeight="29.0" prefWidth="50.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="2:43" />
+               </children>
+            </Pane>
+            <Label fx:id="componentUsernameLabel" layoutX="7.0" layoutY="3.0" prefHeight="23.0" prefWidth="149.0" style="-fx-font-weight: bold; -fx-font-size: 15; -fx-font-family: comic;" textFill="#dd1616" />
+            <Label fx:id="redCrownNumber" layoutX="406.0" layoutY="222.0" prefHeight="30.0" prefWidth="18.0" style="-fx-font-size: 22; -fx-font-weight: bold;" text="0" />
+            <ImageView fitHeight="44.0" fitWidth="40.0" layoutX="391.0" layoutY="246.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="/gameUtil/images/road/royal-rumble.png" />
+               </image></ImageView>
+            <Label fx:id="blueCrownNumber" layoutX="408.0" layoutY="360.0" prefHeight="30.0" prefWidth="18.0" style="-fx-font-size: 22; -fx-font-weight: bold;" text="0" />
+            <ImageView fitHeight="30.0" fitWidth="27.0" layoutX="400.0" layoutY="335.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="/gameUtil/images/road/clash-royale.png" />
+               </image></ImageView>
+         </children></AnchorPane>
+      <Label layoutX="31.0" layoutY="664.0" prefHeight="23.0" prefWidth="50.0" style="-fx-font-weight: bold; -fx-font-size: 13;" text="Next:" />
+      <ImageView fx:id="nextCardImage" fitHeight="65.0" fitWidth="50.0" layoutX="25.0" layoutY="687.0" pickOnBounds="true" preserveRatio="true" />
+      <ProgressBar fx:id="elixirBar" layoutX="104.0" layoutY="743.0" prefHeight="17.0" prefWidth="325.0" progress="0.0" />
+      <ImageView fx:id="elixirImage" fitHeight="23.0" fitWidth="23.0" layoutX="78.0" layoutY="737.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="/gameUtil/images/road/Elixir.png" />
+         </image></ImageView>
    </children>
 </AnchorPane>

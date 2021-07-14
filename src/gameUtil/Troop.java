@@ -87,6 +87,15 @@ public class Troop extends Card implements Serializable {
     }
 
     /**
+     * this method checks if troop is area splash
+     * @return true if it is area splash else false
+     */
+    @Override
+    public boolean isAreaSplash() {
+        return isAreaSplash;
+    }
+
+    /**
      * this method is a setter
      * @param troopName this is name of the troop
      */

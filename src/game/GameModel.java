@@ -3,6 +3,10 @@ package game;
 import  javafx.geometry.Point2D;
 import gameUtil.*;
 import javafx.scene.control.Button;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
+import player.Player;
 import player.Status;
 
 import java.util.ArrayList;
@@ -16,10 +20,11 @@ public class GameModel {
     // middle point of the map
     // head and tail of left and right bridge
     // status of the both players
+    // both players
     // this button is stacked for some purposes (changing its image)
     // this card is stacked which might be transferred to AliveTroop
     private static final float MINIMUM_DISTANCE = 20.0f;
-    public static final Point2D MIDDLE_SECOND_LAYER = new Point2D(213.5, 272.5);
+    public static final Point2D MIDDLE_SECOND_LAYER = new Point2D(213.5,300);
     private final int BRIDGE_LENGTH = 14;
     private Point2D LEFT_BRIDGE_HEAD;
     private Point2D LEFT_BRIDGE_TAIL;
@@ -27,6 +32,9 @@ public class GameModel {
     private Point2D RIGHT_BRIDGE_TAIL;
     private Status statusPlayer1;
     private Status statusPlayer2;
+    private Player player2;
+    private Player player1;
+    private Server server;
     private Button stackedButton;
     private Card stackedCard;
 
@@ -49,16 +57,16 @@ public class GameModel {
 
     /**
      * this method initialize the gameModel
-     * @param statusPlayer1 is player1 status
-     * @param statusPlayer2 is player2 status
+     * @param status1 is player1 status
+     * @param status2 is player2 status
      */
-    public void initialize(Status statusPlayer1, Status statusPlayer2) {
-        LEFT_BRIDGE_HEAD = new Point2D(20, 292);
-        LEFT_BRIDGE_TAIL = new Point2D(20, 308);
-        RIGHT_BRIDGE_HEAD = new Point2D(330, 292);
-        RIGHT_BRIDGE_TAIL = new Point2D(330, 308);
-        this.statusPlayer1 = statusPlayer1;
-        this.statusPlayer2 = statusPlayer2;
+    public void initialize(Status status1 , Status status2) {
+        LEFT_BRIDGE_HEAD = new Point2D(33, 300);
+        LEFT_BRIDGE_TAIL = new Point2D(33, 325);
+        RIGHT_BRIDGE_HEAD = new Point2D(335, 300);
+        RIGHT_BRIDGE_TAIL = new Point2D(335, 325);
+        this.statusPlayer1 = status1;
+        this.statusPlayer2 = status2;
     }
 
     /**
@@ -69,6 +77,22 @@ public class GameModel {
         handlePlayer(statusPlayer1, statusPlayer1.getAliveEnemyTroops());
         statusPlayer2.setEnemyStatus(statusPlayer1);
         handlePlayer(statusPlayer2, statusPlayer2.getAliveEnemyTroops());
+        removeDeadTroops(statusPlayer1.getAliveAllyTroops());
+        removeDeadTroops(statusPlayer1.getAliveEnemyTroops());
+        removeDeadTroops(statusPlayer2.getAliveAllyTroops());
+        removeDeadTroops(statusPlayer2.getAliveEnemyTroops());
+    }
+
+    /**
+     * this method remove dead players
+     */
+    private void removeDeadTroops(ArrayList<AliveTroop> aliveTroops) {
+        ArrayList<AliveTroop> troopsToBeRemoved = new ArrayList<>();
+        aliveTroops.forEach(troop -> {
+            if (!troop.isAlive())
+                troopsToBeRemoved.add(troop);
+        });
+        aliveTroops.removeAll(troopsToBeRemoved);
     }
 
     /**
@@ -80,11 +104,16 @@ public class GameModel {
         ArrayList<AliveTroop> troopsToBeRemoved = new ArrayList<>();
         for (var troop : allyStatus.getAliveAllyTroops()) {
             if (!(troop.getCard() instanceof Spell)) {
-                AliveTroop targetTroop = determineTargetInSight(troop, aliveEnemyTroops);
-                determineVelocityDirection(troop, targetTroop, aliveEnemyTroops);
-                AliveTroop inRangeEnemy = determineTargetsInRange(troop, aliveEnemyTroops);
-                if (inRangeEnemy != null)
-                        attackEnemiesInRange(inRangeEnemy , troop);
+                if (!troop.isEngaged() || troop.getCard().isAreaSplash()) {
+                    AliveTroop targetTroop = determineTargetInSight(troop, aliveEnemyTroops);
+                    determineVelocityDirection(troop, targetTroop, aliveEnemyTroops);
+                    ArrayList<AliveTroop> inRangeEnemy = determineTargetsInRange(troop, aliveEnemyTroops);
+                    troop.setInRangeEnemies(inRangeEnemy);
+                }
+                if (troop.getInRangeEnemies() != null)
+                        troop.getInRangeEnemies().forEach(enemyTroop ->
+                                attackEnemiesInRange(enemyTroop, troop));
+                removeDeadTroops(troop.getInRangeEnemies());
                 troop.move();
             } else {
                 var card = troop.getCard();
@@ -141,16 +170,23 @@ public class GameModel {
      * @param troop is the allys' troop
      * @param aliveEnemyTroops is the status of the enemy
      */
-    private AliveTroop determineTargetsInRange(AliveTroop troop, ArrayList<AliveTroop> aliveEnemyTroops) {
+    private ArrayList<AliveTroop> determineTargetsInRange(AliveTroop troop, ArrayList<AliveTroop> aliveEnemyTroops) {
         float minimumDistance = Integer.MAX_VALUE;
         float distance = 0;
-        AliveTroop closestEnemy = null;
+        ArrayList<AliveTroop> inRangeEnemies = new ArrayList<>();
         if (troop.getCard() instanceof Troop) {
             if (!((Troop) troop.getCard()).getName().equals(TroopName.GIANT)) {
                 for (var enemyTroop : aliveEnemyTroops) {
-                    if ((distance = (float) enemyTroop.getTroopLocation().distance(troop.getTroopLocation())) <
-                            troop.getCard().getRange() && !(troop.getCard() instanceof Spell))
+                    double size = 40;
+                    if (troop.getCard() instanceof Building && (
+                        enemyTroop.getCard().getName().equals(BuildingName.KING_TOWER) ||
+                        enemyTroop.getCard().getName().equals(BuildingName.ARCHER_TOWER)))
+                        size = 60;
+                    if (isIntersected(troop.getTroopLocation(), 40, 40, enemyTroop.getTroopLocation(), troop.getCard().getRange() * 8)
+                            && !(troop.getCard() instanceof Spell))
                     {
+                        distance = (float) enemyTroop.getTroopLocation().distance(
+                                new Point2D(troop.getTroopLocation().getX() + size/2.0, troop.getTroopLocation().getY() + size/2.0));
                         if (enemyTroop.getCard() instanceof Troop)
                         {
                             if (((Troop) enemyTroop.getCard()).getName().equals(TroopName.BABY_DRAGON)
@@ -158,7 +194,13 @@ public class GameModel {
                                 continue;
                         }
                         if (distance < minimumDistance) {
-                            closestEnemy = enemyTroop;
+                            if (troop.getCard().isAreaSplash())
+                                inRangeEnemies.add(enemyTroop);
+                            else {
+                                if (inRangeEnemies.size() == 0)
+                                    inRangeEnemies.add(enemyTroop);
+                                else inRangeEnemies.set(0, enemyTroop);
+                            }
                             minimumDistance = distance;
                         }
                     }
@@ -170,14 +212,17 @@ public class GameModel {
                                     troop.getCard().getRange())
                     {
                         if (distance < minimumDistance) {
-                            closestEnemy = enemyTroop;
+                            if (inRangeEnemies.size() == 0)
+                                inRangeEnemies.add(enemyTroop);
+                            else inRangeEnemies.set(0, enemyTroop);
+
                             minimumDistance = distance;
                         }
                     }
                 }
             }
         }
-        return closestEnemy;
+        return inRangeEnemies;
     }
 
     /**
@@ -186,15 +231,10 @@ public class GameModel {
      * @param troop is the attacker
      */
     private void attackEnemiesInRange(AliveTroop targetTroop, AliveTroop troop) {
-        if (!troop.isEngaged()) {
-            targetTroop.reduceHP((int) troop.getDamage());
-            troop.setEngagedEnemy(targetTroop);
-        } else
-            troop.getEngagedEnemy().reduceHP((int) troop.getDamage());
-
-        if (troop.getEngagedEnemy() != null &&
-           !troop.getEngagedEnemy().isAlive())
-            troop.setEngagedEnemy(null);
+        if(targetTroop != null) {
+            troop.switchAttackCondition();
+            targetTroop.reduceHP(troop.getDamage());
+        }
     }
 
     /**
@@ -216,9 +256,9 @@ public class GameModel {
                         if (enemyTroop.getCard() instanceof Building ||
                             enemyTroop.getCard() instanceof Troop)
                         {
-                            if (((Troop) enemyTroop.getCard()).getName().equals(TroopName.BABY_DRAGON)
-                                  && troop.getCard().getTarget().equals(GROUND));
-
+                            if (enemyTroop.getCard() instanceof Troop &&
+                                ((Troop) enemyTroop.getCard()).getName().equals(TroopName.BABY_DRAGON) &&
+                                troop.getCard().getTarget().equals(GROUND)) continue;
                             else if (distance < minimumDistance) {
                                 closestEnemy = enemyTroop;
                                 minimumDistance = distance;
@@ -249,6 +289,7 @@ public class GameModel {
      * @param aliveEnemyTroops is the targets' status
      */
     private void determineVelocityDirection(AliveTroop troop, AliveTroop targetTroop, ArrayList<AliveTroop> aliveEnemyTroops) {
+        System.out.println("target is : " + targetTroop);
         var troopLocation = troop.getTroopLocation();
         if (troop.getCard().getName().equals(BuildingName.ARCHER_TOWER) ||
             troop.getCard().getName().equals(BuildingName.KING_TOWER))
@@ -259,18 +300,24 @@ public class GameModel {
                 troop.setTroopVelocityDirection(new Point2D(0, 1));
             return;
         }
-        if (targetTroop == null && troopLocation.getY() > LEFT_BRIDGE_TAIL.getY()) {
+        if (targetTroop == null && troopLocation.getY() >= LEFT_BRIDGE_TAIL.getY()) {
             double x = 0;
             if (troopLocation.distance(LEFT_BRIDGE_TAIL) <
-                troopLocation.distance(RIGHT_BRIDGE_TAIL))
-                x = LEFT_BRIDGE_TAIL.subtract(troopLocation).angle(new Point2D(0, -1));
-            else
-                x = RIGHT_BRIDGE_TAIL.subtract(troopLocation).angle(new Point2D(0, -1));
+                troopLocation.distance(RIGHT_BRIDGE_TAIL)) {
+                x = (LEFT_BRIDGE_TAIL.getX() > troopLocation.getX() ? 1:-1) * LEFT_BRIDGE_TAIL.subtract(troopLocation).angle(new Point2D(0, -1));
+                System.out.println("condition1");
+            }
+            else {
+                x = (RIGHT_BRIDGE_TAIL.getX() > troopLocation.getX() ? 1:-1) * RIGHT_BRIDGE_TAIL.subtract(troopLocation).angle(new Point2D(0, -1));
+                System.out.println("condition2: " + x);
+            }
 
-            troop.setTroopVelocityDirection(new Point2D(sin(x), cos(x)));
+            troop.setTroopVelocityDirection(new Point2D(sin(x/180 * Math.PI), -cos(x/180 * Math.PI)));
         } else if (targetTroop == null &&
                    troopLocation.getY() < LEFT_BRIDGE_TAIL.getY() &&
-                   troopLocation.getY() > LEFT_BRIDGE_HEAD.getY())
+                   troopLocation.getY() >= LEFT_BRIDGE_HEAD.getY() &&
+                  (Math.abs(troopLocation.getX() - LEFT_BRIDGE_HEAD.getX()) < 5 ||
+                   Math.abs(troopLocation.getX() - RIGHT_BRIDGE_HEAD.getX()) < 5))
         {
             troop.setTroopVelocityDirection(new Point2D(0, -1));
         } else {
@@ -280,9 +327,9 @@ public class GameModel {
             else
                 targetLocation = makeQueryForClosestTower(aliveEnemyTroops, troop);
 
-            double x = targetLocation != null ?
-                       targetLocation.subtract(troopLocation).angle(new Point2D(0, -1)) : 0;
-            troop.setTroopVelocityDirection(new Point2D(sin(x), cos(x)));
+            double x = ((targetLocation != null ? targetLocation.getX() : 0) > troopLocation.getX() ? 1:-1) * (targetLocation != null ?
+                       targetLocation.subtract(troopLocation).angle(new Point2D(0, -1)) : 0);
+            troop.setTroopVelocityDirection(new Point2D(sin(x/180 * Math.PI), -cos(x/180 * Math.PI)));
         }
     }
 
@@ -348,5 +395,20 @@ public class GameModel {
      */
     public static boolean  isValidCoordination(Point2D point2D) {
         return true;
+    }
+
+    /**
+     * this method checks for the intersection
+     * @param point1 is the top left of the troop which has gotten offended
+     * @param width width of the  troop
+     * @param height height of the troop
+     * @param point2 is the top left of the offender
+     * @param radius is the range of the offender
+     * @return if offender will attack defender
+     */
+    private boolean isIntersected(Point2D point1, int width, int height, Point2D point2, double radius) {
+        Circle circle = new Circle(point1.getX() + 25, point2.getY() + 25, radius);
+        Rectangle rectangle = new Rectangle(point2.getX(), point2.getY(), width, height);
+        return Shape.intersect(circle, rectangle).getBoundsInLocal().getWidth() != -1;
     }
 }

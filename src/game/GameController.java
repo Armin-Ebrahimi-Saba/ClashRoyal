@@ -8,6 +8,8 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -40,6 +42,13 @@ public class GameController implements EventHandler<MouseEvent> {
     @FXML private Button tower4;
     @FXML private Button king1;
     @FXML private Button king2;
+    @FXML private Label timerLabel;
+    @FXML private Label blueCrownNumber;
+    @FXML private Label redCrownNumber;
+    @FXML private Label componentUsernameLabel;
+    @FXML private ProgressBar elixirBar;
+    @FXML private ImageView nextCardImage;
+    @FXML private ImageView elixirImage;
 
     /**
      * this is a constructor
@@ -57,7 +66,7 @@ public class GameController implements EventHandler<MouseEvent> {
      * this method initialize game
      */
     public void initialize(Status status1, Status status2) {
-        Thread thread = new Thread(() -> {
+        Thread timerThread = new Thread(() -> {
             int time = 180;
             int counter1 = 0;
             int counter2 = 0;
@@ -80,10 +89,29 @@ public class GameController implements EventHandler<MouseEvent> {
                 if (status2.getElixirs() < 10)
                     counter2++;
                 time--;
+                int finalTime = time;
+                Platform.runLater(() -> timerLabel.setText(finalTime /60 + ":" + finalTime %60));
             }
 //            indicateTheWinner();
         });
-        thread.start();
+        Thread elixirThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Platform.runLater(() -> {
+                        elixirImage.setAccessibleText(String.valueOf(status1.getElixirs()));
+                        elixirBar.setProgress(status1.getElixirs()/10.0);
+                    });
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        nextCardImage.setFitHeight(60);
+        nextCardImage.setFitWidth(45);
+        timerThread.start();
+        elixirThread.start();
+        componentUsernameLabel.setText(status2.getUsername());
         secondLayerPane = new AnchorPane();
         secondLayerPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.0)");
         gameModel = new GameModel();
@@ -121,8 +149,8 @@ public class GameController implements EventHandler<MouseEvent> {
     private void setButtonImage(Button cardButton, String imageAddress) {
         Image image = new Image(imageAddress);
         ImageView view = new ImageView(image);
-        view.setFitHeight(100);
-        view.setFitWidth(100);
+        view.setFitHeight(80);
+        view.setFitWidth(80);
         cardButton.setGraphic(view);
     }
 
@@ -139,19 +167,23 @@ public class GameController implements EventHandler<MouseEvent> {
         if (mouseEvent.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
             if (gameModel.getStackedButton() != null &&
                 gameModel.getStackedCard() != null &&
-                GameModel.isValidCoordination(mouseLocation))
-            {
+                GameModel.isValidCoordination(mouseLocation)) {
                 var cardDeskInUse = gameModel.getPlayersStatus()[0].getCardsDeskInUse();
                 var aliveAllyTroops = gameModel.getPlayersStatus()[0].getAliveAllyTroops();
                 var stackedCard = gameModel.getStackedCard();
-                for (int i = 0; i < (stackedCard instanceof Troop ? ((Troop)stackedCard).getCount() : 1); i++)
-                    aliveAllyTroops.add(new AliveTroop(gameModel.getStackedCard(), mouseLocation));
+                for (int i = 0; i < (stackedCard instanceof Troop ? ((Troop) stackedCard).getCount() : 1); i++) {
+                    if (i % 2 == 0)
+                        aliveAllyTroops.add(new AliveTroop(gameModel.getStackedCard(), new Point2D(mouseLocation.getX() + 20 * i, mouseLocation.getY())));
+                    if (i % 2 != 0)
+                        aliveAllyTroops.add(new AliveTroop(gameModel.getStackedCard(), new Point2D(mouseLocation.getX(), mouseLocation.getY() + 20 * (i - 1))));
+                }
                 cardDeskInUse.remove(stackedCard);
                 cardDeskInUse.add(0, gameModel.getStackedCard());
                 for (int i = 0; i < 4; i++)
                     setButtonImage(listedButtons.get(i), cardDeskInUse.get(4 + i).getCardAddress());
+                nextCardImage.setImage(new Image(cardDeskInUse.get(3).getCardAddress()));
+                client1.getStatus().decreaseElixirs(gameModel.getStackedCard().getCost());
                 gameModel.resetStack();
-                System.out.println("mouse clicked second");
             }
         }
         mouseEvent.consume();

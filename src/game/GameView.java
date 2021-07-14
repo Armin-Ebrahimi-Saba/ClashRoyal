@@ -15,7 +15,6 @@ public class GameView extends Pane {
     private GameModel gameModel;
     private ImageView[][] firstLayerCellViews;
     private ArrayList<ImageView> secondLayerCellViews;
-//    private AnchorPane secondLayerPane;
     private int CELL_WIDTH = 10;
     private int rowCount = 20;
     private int columnCount = 20;
@@ -41,8 +40,6 @@ public class GameView extends Pane {
      * Constructs an empty grid of ImageViews
      */
     private void initializeSecondLayerGrid() {
-//        secondLayerPane = new AnchorPane();
-//        this.getChildren().add(secondLayerPane);
         secondLayerCellViews = new ArrayList<>(30);
     }
 
@@ -59,7 +56,6 @@ public class GameView extends Pane {
                 imageView.setFitWidth(CELL_WIDTH);
                 imageView.setFitHeight(CELL_WIDTH);
                 firstLayerCellViews[row][column] = imageView;
-                //this.getChildren().add(imageView);
             }
         }
     }
@@ -68,7 +64,6 @@ public class GameView extends Pane {
      * this method updates the view
      */
     public void update(GameModel model) {
-        System.out.println(model.getPlayersStatus()[0].getAliveAllyTroops());
         secondLayerCellViews.clear();
         this.getChildren().clear();
         for (var troop : model.getPlayersStatus()[0].getAliveEnemyTroops()) {
@@ -87,8 +82,6 @@ public class GameView extends Pane {
                 this.getChildren().add(imageView);
             }
         }
-//        secondLayerCellViews.forEach(
-//                cv -> secondLayerPane.getChildren().add(cv));
     }
 
     /**
@@ -100,8 +93,6 @@ public class GameView extends Pane {
         ImageView imageView = new ImageView();
         Image image = new Image(troop.getCard().getCharacterImageAddress());
         imageView.setImage(image);
-        System.out.print(troop.getCard().getName() + ": ");
-        System.out.println(troop.getTroopLocation());
         imageView.setLayoutX(troop.getTroopLocation().getX());
         imageView.setLayoutY(troop.getTroopLocation().getY());
         imageView.setSmooth(true);
@@ -110,12 +101,12 @@ public class GameView extends Pane {
             rotateImageView(troop.getTroopVelocityDirection(), imageView);
         if (troop.getCard().getName() != BuildingName.ARCHER_TOWER &&
             troop.getCard().getName() != BuildingName.KING_TOWER) {
-            imageView.setFitWidth(50);
-            imageView.setFitHeight(50);
+            imageView.setFitWidth(40);
+            imageView.setFitHeight(40);
             imageView.setPreserveRatio(true);
         } else {
-            imageView.setFitWidth(80);
-            imageView.setFitHeight(80);
+            imageView.setFitWidth(60);
+            imageView.setFitHeight(60);
             imageView.setPreserveRatio(true);
         }
         return imageView;
@@ -127,14 +118,7 @@ public class GameView extends Pane {
      * @param imageView is the image view which should be rotated
      */
     private void rotateImageView(Point2D direction, ImageView imageView) {
-        double degree = direction.angle(0, -1);
-//        degree = Math.abs(Math.atan(direction.getY()/ (direction.getX() + 0.0000001231)) / Math.PI) * 180;
-//        if (direction.getY() >= 0 && direction.getX() < 0)
-//            degree = -degree;
-//        else if (direction.getY() <= 0 && direction.getX() > 0)
-//            degree = 180 - degree;
-//        else if (direction.getY() <= 0 && direction.getX() < 0)
-//            degree -= 180;
+        double degree = (direction.getX() < 0 ? -1:1) * direction.angle(0, -1);
         imageView.setRotate(degree);
     }
 }

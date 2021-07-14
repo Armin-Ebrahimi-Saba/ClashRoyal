@@ -95,4 +95,10 @@ public abstract class Card implements Serializable {
     public int getCost() {
         return cost;
     }
+
+    /**
+     * this method is a getter
+     * @return true if it is area splash else false
+     */
+    public abstract boolean isAreaSplash();
 }

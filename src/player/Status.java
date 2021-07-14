@@ -28,7 +28,7 @@ public class Status implements Serializable {
     public Status(String username) {
         this.username = username;
         this.trophy = 0;
-        this.elixirs = 0;
+        this.elixirs = 5;
         this.level = 1;
         this.XP = 0;
         aliveAllyTroops = new ArrayList<>();
@@ -49,9 +49,9 @@ public class Status implements Serializable {
      */
     public void resetTowers() {
         aliveAllyTroops.clear();
-        aliveAllyTroops.add(new AliveTroop(CardsCollection.getArcherTowers().get(level - 1), new Point2D(21.0, 473)));
+        aliveAllyTroops.add(new AliveTroop(CardsCollection.getArcherTowers().get(level - 1), new Point2D(33.0, 473)));
         aliveAllyTroops.add(new AliveTroop(CardsCollection.getArcherTowers().get(level - 1), new Point2D(324.0, 473)));
-        aliveAllyTroops.add(new AliveTroop(CardsCollection.getKingTowers().get(level - 1), new Point2D(166.0, 567)));
+        aliveAllyTroops.add(new AliveTroop(CardsCollection.getKingTowers().get(level - 1), new Point2D(174.0, 567)));
     }
 
     /**
@@ -136,9 +136,10 @@ public class Status implements Serializable {
      */
     public void setRelativeEnemyStatus(Status enemyStatus) {
         enemyStatus.getAliveAllyTroops().forEach(troop -> {
-            troop.setTroopLocation(getEnemyRelativePoint(troop.getTroopLocation()));
-            aliveEnemyTroops.clear();
-            aliveEnemyTroops.add(troop);
+            if (!aliveEnemyTroops.contains(troop)) {
+                troop.setTroopLocation(getEnemyRelativePoint(troop.getTroopLocation()));
+                aliveEnemyTroops.add(troop);
+            }
         });
         enemyUsername = enemyStatus.getUsername();
     }
@@ -174,6 +175,14 @@ public class Status implements Serializable {
      */
     private Point2D getEnemyRelativePoint(Point2D point) {
         return new Point2D (point.getX(), 2 * GameModel.MIDDLE_SECOND_LAYER.getY() - point.getY());
+    }
+
+    /**
+     * this method decrease number of elixirs of this player
+     * @param cost is the cost of the card which was used
+     */
+    public void decreaseElixirs(int cost) {
+        elixirs -= cost;
     }
 
 //    /**
