@@ -11,8 +11,11 @@ import dbUtil.DBConnection;
 import player.Status;
 
 public class LoginModel {
-    Connection connection;
+    private Connection connection;
 
+    /**
+     * this is a constructor
+     */
     public LoginModel() {
         try {
             this.connection = DBConnection.getConnection();
@@ -24,6 +27,10 @@ public class LoginModel {
         }
     }
 
+    /**
+     * this method checks if model is connected to the database
+     * @return true if it is connected else false
+     */
     public boolean isDataBaseConnected() {
         return this.connection != null;
     }
@@ -32,10 +39,10 @@ public class LoginModel {
      * this method validate a username and password which was sent by the user
      * @param username is the sent username
      * @param password is the sent password
-     * @return status related to this username and password if it is new username and password it will send simplest status possible
+     * @return status related to this username and password in special encoding if it is new username and password it will send simplest status possible
      * @throws Exception is an exception that might be thrown due to working with prepared statement
      */
-    public Status validateUsernameAndPassword(String username,
+    public String validateUsernameAndPassword(String username,
                                               String password) throws Exception {
         PreparedStatement preparedStatement  = null;
         ResultSet resultSet = null;
@@ -54,9 +61,10 @@ public class LoginModel {
                 preparedStatementInsert.setString(1, username);
                 preparedStatementInsert.setString(2, password);
                 preparedStatementInsert.setString(3, toString(newStatus));
-                return newStatus;
+                preparedStatementInsert.execute(commandInsert);
+                return toString(newStatus);
             } else if (password.equals(resultSet.getString(2)))
-                return (Status)fromString(resultSet.getString(3));
+                return resultSet.getString(3);
         } catch(SQLException ex) {
             ex.printStackTrace();
             return null;
@@ -68,17 +76,6 @@ public class LoginModel {
                 resultSet.close();
         }
         return null;
-    }
-
-    /** Read the object from a Base64 string. */
-    private static Object fromString( String s ) throws IOException ,
-            ClassNotFoundException {
-        byte [] data = Base64.getDecoder().decode( s );
-        ObjectInputStream ois = new ObjectInputStream(
-                new ByteArrayInputStream(  data ) );
-        Object o  = ois.readObject();
-        ois.close();
-        return o;
     }
 
     /** Write the object to a Base64 string. */

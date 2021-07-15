@@ -83,7 +83,7 @@ public class Troop extends Card implements Serializable {
      */
     @Override
     public double getRange() {
-        return range;
+        return range * 14;
     }
 
     /**
@@ -93,6 +93,15 @@ public class Troop extends Card implements Serializable {
     @Override
     public boolean isAreaSplash() {
         return isAreaSplash;
+    }
+
+    /**
+     * this method is a getter
+     * @return hit speed of the troop
+     */
+    @Override
+    public double getHitSpeed() {
+        return hitSpeed;
     }
 
     /**

@@ -18,20 +18,29 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import player.Bot;
+import player.Client;
+import player.Player;
 import player.Status;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
+
+import static java.lang.Thread.sleep;
 
 public class MenuController {
     private MenuModel menuModel;
     private HashMap<Button, Card> linkedButtons;
 
+    @FXML private Button battleButton;
     @FXML private Button normalBotButton;
+    @FXML private Button smartBotButton;
     @FXML private TabPane mainMenuTabPane;
-    @FXML private ButtonBar buttonBar1;
     @FXML private Button button1;
     @FXML private Button button2;
     @FXML private Button button3;
@@ -63,15 +72,16 @@ public class MenuController {
 
     /**
      * this method initialize the menu controller
-     * @param data is the status of the player
+     * @param client is the player object which holds clients attributes
      * @throws IOException is the exception
      */
-    public void initialize(Status data) throws IOException {
+    public void initialize(Client client) throws IOException {
+        Status clientStatus = client.getStatus();
         ArrayList<Button> buttonsList = new ArrayList<>();
         Collections.addAll(buttonsList, button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11, button12);
         linkedButtons = new HashMap<>();
         menuModel = new MenuModel();
-        menuModel.setStatus(data);
+        menuModel.setStatus(clientStatus);
         usernameLabel.setText(menuModel.getStatus().getUsername());
         trophyLabel.setText(String.valueOf(menuModel.getStatus().getTrophy()));
         levelLabel.setText(String.valueOf(menuModel.getStatus().getLevel()));
@@ -100,7 +110,7 @@ public class MenuController {
                     FXMLLoader loader = new FXMLLoader();
                     Pane root = loader.load(getClass().getResource("/game/game.fxml").openStream());
                     GameController gameController = loader.getController();
-                    gameController.initialize(menuModel.getStatus(), new Status("EasyBot"));
+                    gameController.initialize(client, new Bot(new Status("EasyBot"), false));
                     Scene scene = new Scene(root);
                     playerStage.setScene(scene);
                     playerStage.setTitle("Clash Royal");
@@ -113,6 +123,73 @@ public class MenuController {
             }
         };
         normalBotButton.setOnAction(normalBotButtonEvent);
+
+        EventHandler<ActionEvent> smartBotButtonEvent = new EventHandler<>() {
+            public void handle(ActionEvent e) {
+                try {
+                    menuModel.getStatus().getCardsDeskInUse().clear();
+                    linkedButtons.remove(button9);
+                    linkedButtons.remove(button10);
+                    linkedButtons.remove(button11);
+                    linkedButtons.remove(button12);
+                    menuModel.getStatus().getCardsDeskInUse().addAll(linkedButtons.values());
+                    Stage playerStage = new Stage();
+                    FXMLLoader loader = new FXMLLoader();
+                    Pane root = loader.load(getClass().getResource("/game/game.fxml").openStream());
+                    GameController gameController = loader.getController();
+                    gameController.initialize(client, new Bot(new Status("SmartBot"), true));
+                    Scene scene = new Scene(root);
+                    playerStage.setScene(scene);
+                    playerStage.setTitle("Clash Royal");
+                    root.setOnMouseClicked(gameController);
+                    playerStage.setResizable(false);
+                    playerStage.show();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+            }
+        };
+        smartBotButton.setOnAction(smartBotButtonEvent);
+
+        EventHandler<ActionEvent> battleButtonEvent = new EventHandler<>() {
+            String s;
+            public void handle(ActionEvent e) {
+                try {
+                    Thread thread = new Thread(() -> {
+                        while (!(s = client.getLastRespond()).contains("<READY>")) {
+                            try {
+                                Thread.sleep(150);
+                            } catch (InterruptedException interruptedException) {
+                                interruptedException.printStackTrace();
+                            }
+                        }
+                    });
+                    thread.start();
+                    thread.join();
+                    menuModel.getStatus().getCardsDeskInUse().clear();
+                    linkedButtons.remove(button9);
+                    linkedButtons.remove(button10);
+                    linkedButtons.remove(button11);
+                    linkedButtons.remove(button12);
+                    menuModel.getStatus().getCardsDeskInUse().addAll(linkedButtons.values());
+                    Stage playerStage = new Stage();
+                    FXMLLoader loader = new FXMLLoader();
+                    Pane root = loader.load(getClass().getResource("/game/game.fxml").openStream());
+                    GameController gameController = loader.getController();
+                    Status status = (Status)fromString(s.split(" ", 2)[1]);
+                    Client componentClient = new Client();
+                    componentClient.setStatus(status);
+                    gameController.initialize(client, componentClient);
+                    Scene scene = new Scene(root);
+                    playerStage.setScene(scene);
+                    playerStage.setTitle("Clash Royal");
+                    root.setOnMouseClicked(gameController);
+                    playerStage.setResizable(false);
+                    playerStage.show();
+                } catch (IOException | InterruptedException | ClassNotFoundException ioException) {ioException.printStackTrace();}
+            }
+        };
+        battleButton.setOnAction(battleButtonEvent);
 
         mainMenuTabPane.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -151,5 +228,16 @@ public class MenuController {
         view.setFitHeight(140);
         view.setFitWidth(140);
         button.setGraphic(view);
+    }
+
+    /** Read the object from a Base64 string. */
+    private Object fromString( String s ) throws IOException ,
+            ClassNotFoundException {
+        byte [] data = Base64.getDecoder().decode( s );
+        ObjectInputStream ois = new ObjectInputStream(
+                new ByteArrayInputStream(  data ) );
+        Object o  = ois.readObject();
+        ois.close();
+        return o;
     }
 }

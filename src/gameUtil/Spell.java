@@ -62,7 +62,7 @@ public class Spell extends Card implements Serializable {
      */
     @Override
     public double getRange() {
-        return range;
+        return range * 12;
     }
 
     /**
@@ -72,6 +72,11 @@ public class Spell extends Card implements Serializable {
     @Override
     public boolean isAreaSplash() {
         return false;
+    }
+
+    @Override
+    public double getHitSpeed() {
+        return Integer.MAX_VALUE;
     }
 
     /**

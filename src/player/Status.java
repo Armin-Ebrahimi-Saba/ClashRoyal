@@ -15,11 +15,13 @@ public class Status implements Serializable {
     final transient private ArrayList<AliveTroop> aliveAllyTroops;
     transient private ArrayList<AliveTroop> aliveEnemyTroops;
     transient private String enemyUsername;
+    transient private Status enemyStatus;
     private final String username;
     private int trophy;
     private int level;
     private int XP;
     private int elixirs;
+    private ArrayList<String> history;
 
     /**
      * this is a constructor
@@ -40,6 +42,10 @@ public class Status implements Serializable {
         resetTowers();
     }
 
+    /**
+     * this method is a getter
+     * @return list of all alive ally troops
+     */
     public ArrayList<AliveTroop> getAliveAllyTroops() {
         return aliveAllyTroops;
     }
@@ -62,6 +68,22 @@ public class Status implements Serializable {
     }
 
     /**
+     * this method increase xp of this client
+     * @param xp is the xp of this client
+     */
+    public void increaseXP(int xp) {
+        this.XP += xp;
+    }
+
+    /**
+     * this method increase level of this client
+     */
+    public void increaseLevel() {
+        XP = 0;
+        level += 1;
+    }
+
+    /**
      * this method is a getter
      * @return number of trophies
      */
@@ -74,6 +96,18 @@ public class Status implements Serializable {
      * @return number of elixirs
      */
     public int getLevel() {
+        if (XP <= 300)
+            level = 1;
+        else if (XP <= 500)
+            level = 2;
+        else if (XP <= 900)
+            level = 3;
+        else if (XP <= 1700)
+            level = 4;
+        else if (XP <= 2500)
+            level = 5;
+        else
+            level = 6;
         return level;
     }
 
@@ -90,22 +124,6 @@ public class Status implements Serializable {
      */
     public void increaseElixirs() {
         elixirs++;
-    }
-
-    /**
-     * this method increase xp of this client
-     * @param xp is the xp of this client
-     */
-    public void increaseXP(int xp) {
-        this.XP += xp;
-    }
-
-    /**
-     * this method increase level of this client
-     */
-    public void increaseLevel() {
-        XP = 0;
-        level += 1;
     }
 
     /**
@@ -135,6 +153,7 @@ public class Status implements Serializable {
      * @param enemyStatus is the status of this enemy
      */
     public void setRelativeEnemyStatus(Status enemyStatus) {
+        this.enemyStatus = enemyStatus;
         enemyStatus.getAliveAllyTroops().forEach(troop -> {
             if (!aliveEnemyTroops.contains(troop)) {
                 troop.setTroopLocation(getEnemyRelativePoint(troop.getTroopLocation()));
@@ -162,6 +181,14 @@ public class Status implements Serializable {
     }
 
     /**
+     * this method is a getter
+     * @return status of the enemy
+     */
+    public Status getEnemyStatus() {
+        return enemyStatus;
+    }
+
+    /**
      * this is a getter
      * @return username of the enemy
      */
@@ -173,7 +200,7 @@ public class Status implements Serializable {
      * this method returns the enemies respective position
      * @return enemies respective position
      */
-    private Point2D getEnemyRelativePoint(Point2D point) {
+    public Point2D getEnemyRelativePoint(Point2D point) {
         return new Point2D (point.getX(), 2 * GameModel.MIDDLE_SECOND_LAYER.getY() - point.getY());
     }
 
@@ -185,12 +212,13 @@ public class Status implements Serializable {
         elixirs -= cost;
     }
 
-//    /**
-//     * get a clone from this status
-//     */
-//    public Status clone() {
-//        return new Status()
-//    }
+    /**
+     * this method add a record to the history
+     * @param record is the new record which will be added to the history
+     */
+    public void addRecord(String record) {
+        history.add(record);
+    }
 }
 
 

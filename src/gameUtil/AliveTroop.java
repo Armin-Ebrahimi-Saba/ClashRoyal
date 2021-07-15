@@ -13,20 +13,24 @@ public class AliveTroop implements Serializable {
     // is the current hp of the troop
     // is the time left for the spell of rage or a building like cannon or inferno tower
     // is the booster of this troop which is a rage troop
+    // is the amount of time which this troop was engaged with another troop
     private Point2D troopLocation;
     private Point2D troopVelocityDirection;
     private final Card card;
     private int HP;
-    private boolean isEngaged;
-    private ArrayList<AliveTroop> inRangeEnemies;
+    private ArrayList<AliveTroop> inRangeEnemies = new ArrayList<>();
     private double timeLeft;
     private AliveTroop booster;
+    private double hitTimer;
+    private double engagedTime;
 
     /**
      * this is constructor
      * @param card  is the card which is indicated to this alive troop
      */
     public AliveTroop(Card card, Point2D initialLocation) {
+        this.engagedTime = 0;
+        this.hitTimer = 0;
         this.card = card;
         this.HP = card.getHP();
         this.timeLeft = card.getDamage() * 100;
@@ -84,7 +88,14 @@ public class AliveTroop implements Serializable {
      * @return true if this troop is engaged with another one
      */
     public boolean isEngaged() {
-        return isEngaged;
+        if (inRangeEnemies.size() == 0) {
+            engagedTime = 0;
+            return false;
+        } else {
+            engagedTime += 0.2;
+            return true;
+        }
+
     }
 
     /**
@@ -101,14 +112,10 @@ public class AliveTroop implements Serializable {
      */
     public void setInRangeEnemies(ArrayList<AliveTroop> inRangeEnemies) {
         this.inRangeEnemies = inRangeEnemies;
-        switchAttackCondition();
-    }
-
-    /**
-     * change condition
-     */
-    public void switchAttackCondition() {
-        isEngaged = !isEngaged;
+//        inRangeEnemies.forEach(troop -> {
+//            if (!this.inRangeEnemies.contains(troop))
+//                this.inRangeEnemies.add(troop);
+//        });
     }
 
     /**
@@ -132,10 +139,11 @@ public class AliveTroop implements Serializable {
      * this method move the alive troop
      */
     public void move() {
-        if (card instanceof Troop && !isEngaged) {
+        if (card instanceof Troop && !isEngaged()) {
             double x = troopLocation.getX();
             double y = troopLocation.getY();
-            var speed = troopVelocityDirection.multiply(((Troop) card).getSpeed() * 0.7);
+            var speed = troopVelocityDirection.multiply(((Troop) card).getSpeed() * 0.8 * (booster != null ? 1.4:1));
+            booster = null;
             troopLocation = new Point2D(x + speed.getX(), y + speed.getY());
         }
     }
@@ -153,9 +161,41 @@ public class AliveTroop implements Serializable {
      * @return damage of the troop
      */
     public double getDamage() {
-        if (booster != null && booster.isDurationFinished()) {
-            return card.getDamage();
+        if (booster != null && !booster.isDurationFinished()) {
+            if (card.getName().equals(BuildingName.INFERNO_TOWER))
+                return (card.getDamage() + ((((Building)card).getMaxDamage() - card.getDamage())/3.0) * engagedTime) * 1.4;
+            return card.getDamage() * 1.4;
         }
-        return card.getDamage() * 1.4;
+        if (card.getName().equals(BuildingName.INFERNO_TOWER))
+            return card.getDamage() + ((((Building)card).getMaxDamage() - card.getDamage())/3.0) * engagedTime;
+        return card.getDamage();
+    }
+
+    /**
+     * this method is a getter
+     * @return hp of this troop
+     */
+    public int getHP(){
+        return HP;
+    }
+
+    /**
+     * this method add to the hitTimer
+     */
+    public void updateReloadTimer() {
+        if(hitTimer > 0)
+            hitTimer -= 0.2;
+    }
+
+    /**
+     * this method indicates weather troop is ready for attacking or not
+     * @return true if it is ready for attacking otherwise false
+     */
+    public boolean isReadyForDamaging() {
+        if (hitTimer <= 0) {
+            hitTimer = 1/card.getHitSpeed();
+            return true;
+        }
+        return false;
     }
 }

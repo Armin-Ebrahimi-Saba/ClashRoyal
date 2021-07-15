@@ -7,6 +7,7 @@ public class Building extends Card implements Serializable {
     //lifeTime lifetime of this building
     //hitSpeed hit speed of this building
     //damage is damage of this building
+    //maxDamage is maximum damage of this building which is used for inferno tower
     //range range of this building in which it can attack an enemy
     //buildingName is the name of this building
     private final int HP;
@@ -14,8 +15,8 @@ public class Building extends Card implements Serializable {
     private final double hitSpeed;
     private final double range;
     private int damage;
+    private int maxDamage;
     private BuildingName buildingName;
-
 
     /**
      * this is a constructor
@@ -90,7 +91,7 @@ public class Building extends Card implements Serializable {
      */
     @Override
     public double getRange() {
-        return range;
+        return range * 12;
     }
 
     /**
@@ -132,5 +133,21 @@ public class Building extends Card implements Serializable {
      */
     public void setBuildingName(BuildingName buildingName) {
         this.buildingName = buildingName;
+    }
+
+    /**
+     * this method return the maximum damage of thid building
+     * @return maximum damage of this building
+     */
+    public int getMaxDamage() {
+        return maxDamage;
+    }
+
+    /**
+     * this method is a setter
+     * @param maxDamage is the maximum damage of this building
+     */
+    public void setMaxDamage(int maxDamage) {
+        this.maxDamage = maxDamage;
     }
 }

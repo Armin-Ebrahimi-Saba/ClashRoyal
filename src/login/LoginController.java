@@ -14,28 +14,34 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import player.Client;
 import player.Status;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.Base64;
 
 public class LoginController {
 
-    LoginModel loginModel;
-    @FXML
-    private Label warningLabel;
-    @FXML
-    private TextField usernameTextField;
-    @FXML
-    private PasswordField passwordField;
-    @FXML
-    private Button loginButton;
-    @FXML
-    private ImageView logoImageView;
+    @FXML private Label warningLabel;
+    @FXML private TextField usernameTextField;
+    @FXML private PasswordField passwordField;
+    @FXML private Button loginButton;
+    @FXML private ImageView logoImageView;
+
+    private LoginModel loginModel;
+    private Client client;
+
+
 
     /**
      * this method initialize the login controller and model and view
      */
     public void initialize() {
+        client = new Client();
+        Thread thread = new Thread(client);
+        thread.start();
         loginModel = new LoginModel();
         logoImageView.setImage(new Image("login/images/logo.jpg"));
     }
@@ -57,13 +63,14 @@ public class LoginController {
     public void login(ActionEvent event) {
         Status retrievedData;
         try {
-            if (usernameTextField.getText() != null &&
-                passwordField.getText() != null &&
-                (retrievedData = loginModel.validateUsernameAndPassword(usernameTextField.getText(), passwordField.getText())) != null)
+            if (usernameTextField.getText().length() != 0 &&
+                passwordField.getText().length() != 0 &&
+                (retrievedData = authenticate(usernameTextField.getText(), passwordField.getText())) != null)
             {
                 Stage stage = (Stage)this.loginButton.getScene().getWindow();
                 stage.close();
-                loginThePlayer(retrievedData);
+                client.setStatus(retrievedData);
+                loginThePlayer();
             } else {
                 warningLabel.setText("invalid username or password.");
             }
@@ -74,15 +81,16 @@ public class LoginController {
 
     /**
      *  login the player into game and show the main menu
-     * @param userData is the users' retrieved data
      */
-    public void loginThePlayer(Status userData) {
+    public void loginThePlayer() {
+        if (client.getStatus() == null)
+            return;
         try {
             Stage playerStage = new Stage();
             FXMLLoader loader = new FXMLLoader();
             Pane root = (Pane) loader.load(getClass().getResource("/mainMenu/menu.fxml").openStream());
             MenuController menuController = loader.getController();
-            menuController.initialize(userData);
+            menuController.initialize(client);
             Scene scene = new Scene(root);
             playerStage.setScene(scene);
             playerStage.setTitle("Clash Royal");
@@ -92,4 +100,34 @@ public class LoginController {
             ex.printStackTrace();
         }
     }
+
+    /**
+     * this method validate username and password by accessing database via server
+     * @return retrieved data from database
+     * @param username is the given username from the client
+     * @param password is the given password from the client
+     */
+    public Status authenticate(String username, String password) throws Exception {
+        String respond = "";
+        if (!password.contains(" ") && !username.contains(" ")) {
+            client.sendCommand("<LOGIN> " + username + " " + password);
+            Thread.sleep(1000);
+            respond = client.getLastRespond();
+        }
+        if (respond != null && respond.length() > 5)
+            return (Status)fromString(respond);
+        return null;
+    }
+
+    /** Read the object from a Base64 string. */
+    private static Object fromString( String s ) throws IOException ,
+            ClassNotFoundException {
+        byte [] data = Base64.getDecoder().decode( s );
+        ObjectInputStream ois = new ObjectInputStream(
+                new ByteArrayInputStream(  data ) );
+        Object o  = ois.readObject();
+        ois.close();
+        return o;
+    }
+
 }

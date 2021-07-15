@@ -3,5 +3,5 @@ package gameUtil;
 import java.io.Serializable;
 
 public interface Function extends Serializable {
-        void execute();
+        void execute(AliveTroop troop);
 }

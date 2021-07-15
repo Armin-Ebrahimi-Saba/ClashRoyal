@@ -170,7 +170,7 @@ public class CardsCollection {
                 null,
                 false,
                 "gameUtil/images/Troops/barbarian.png",
-                1,
+                2,
                 4,
                 300,
                 75,
@@ -185,7 +185,7 @@ public class CardsCollection {
                 null,
                 false,
                 "gameUtil/images/Troops/barbarian.png",
-                1,
+                2,
                 4,
                 330,
                 82,
@@ -200,7 +200,7 @@ public class CardsCollection {
                 null,
                 false,
                 "gameUtil/images/Troops/barbarian.png",
-                1,
+                2,
                 4,
                 363,
                 90,
@@ -215,7 +215,7 @@ public class CardsCollection {
                 null,
                 false,
                 "gameUtil/images/Troops/barbarian.png",
-                1,
+                2,
                 4,
                 438,
                 99,
@@ -230,7 +230,7 @@ public class CardsCollection {
                 null,
                 false,
                 "gameUtil/images/Troops/barbarian.png",
-                1,
+                2,
                 4,
                 480,
                 109,
@@ -485,7 +485,7 @@ public class CardsCollection {
                 null,
                 false,
                 "gameUtil/images/Troops/giant.png",
-                1,
+                2,
                 1,
                 2000,
                 126,
@@ -500,8 +500,8 @@ public class CardsCollection {
                 null,
                 false,
                 "gameUtil/images/Troops/giant.png",
-                1,
-                1,
+                2,
+                2,
                 2200,
                 138,
                 3,
@@ -515,7 +515,7 @@ public class CardsCollection {
                 null,
                 false,
                 "gameUtil/images/Troops/giant.png",
-                1,
+                2,
                 1,
                 2420,
                 152,
@@ -530,7 +530,7 @@ public class CardsCollection {
                 null,
                 false,
                 "gameUtil/images/Troops/giant.png",
-                1,
+                2,
                 1,
                 2660,
                 167,
@@ -545,7 +545,7 @@ public class CardsCollection {
                 null,
                 false,
                 "gameUtil/images/Troops/giant.png",
-                1,
+                2,
                 1,
                 2920,
                 183,
@@ -560,7 +560,7 @@ public class CardsCollection {
                 null,
                 true,
                 "gameUtil/images/Troops/valkyrie.png",
-                1,
+                2,
                 1,
                 880,
                 120,
@@ -575,7 +575,7 @@ public class CardsCollection {
                 null,
                 true,
                 "gameUtil/images/Troops/valkyrie.png",
-                1,
+                2,
                 1,
                 968,
                 132,
@@ -590,7 +590,7 @@ public class CardsCollection {
                 null,
                 true,
                 "gameUtil/images/Troops/valkyrie.png",
-                1,
+                2,
                 1,
                 1064,
                 145,
@@ -605,7 +605,7 @@ public class CardsCollection {
                 null,
                 true,
                 "gameUtil/images/Troops/valkyrie.png",
-                1,
+                2,
                 1,
                 1170,
                 159,
@@ -620,7 +620,7 @@ public class CardsCollection {
                 null,
                 true,
                 "gameUtil/images/Troops/valkyrie.png",
-                1,
+                2,
                 1,
                 1284,
                 175,
@@ -635,7 +635,7 @@ public class CardsCollection {
                 null,
                 true,
                 "gameUtil/images/Troops/pekka.png",
-                1,
+                2,
                 1,
                 600,
                 325,
@@ -650,7 +650,7 @@ public class CardsCollection {
                 null,
                 true,
                 "gameUtil/images/Troops/pekka.png",
-                1,
+                2,
                 1,
                 660,
                 357,
@@ -665,7 +665,7 @@ public class CardsCollection {
                 null,
                 true,
                 "gameUtil/images/Troops/pekka.png",
-                1,
+                2,
                 1,
                 726,
                 393,
@@ -680,7 +680,7 @@ public class CardsCollection {
                 null,
                 true,
                 "gameUtil/images/Troops/pekka.png",
-                1,
+                2,
                 1,
                 798,
                 432,
@@ -695,7 +695,7 @@ public class CardsCollection {
                 null,
                 true,
                 "gameUtil/images/Troops/pekka.png",
-                1,
+                2,
                 1,
                 876,
                 474,
@@ -1039,6 +1039,21 @@ public class CardsCollection {
         rages.forEach(troop -> troop.setSpellName(SpellName.RAGE));
         fireballs.forEach(troop -> troop.setSpellName(SpellName.FIRE_BALL));
         arrows.forEach(troop -> troop.setSpellName(SpellName.ARROW));
+
+        infernoTowers.forEach(Building -> {
+           Building.setFunctionality(new Function() {
+               @Override
+               public void execute(AliveTroop troop) {
+
+               }
+           });
+        });
+
+        infernoTowers.get(0).setMaxDamage(400);
+        infernoTowers.get(1).setMaxDamage(440);
+        infernoTowers.get(2).setMaxDamage(484);
+        infernoTowers.get(3).setMaxDamage(532);
+        infernoTowers.get(4).setMaxDamage(584);
     }
 
     /**

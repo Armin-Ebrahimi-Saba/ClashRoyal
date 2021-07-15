@@ -98,7 +98,29 @@ public abstract class Card implements Serializable {
 
     /**
      * this method is a getter
+     * @return special functionality of this card
+     */
+    public Function getFunctionality() {
+        return functionality;
+    }
+
+    /**
+     * this method is a setter
+     * @param function is the special functionality which will be set for this troop
+     */
+    public void setFunctionality(Function function) {
+        this.functionality = function;
+    }
+
+    /**
+     * this method is a getter
      * @return true if it is area splash else false
      */
     public abstract boolean isAreaSplash();
+
+    /**
+     * this method is a getter
+     * @return hit speed of the card
+     */
+    public abstract double getHitSpeed();
 }
