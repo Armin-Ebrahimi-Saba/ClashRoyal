@@ -21,16 +21,24 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Base64;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class LoginController {
-
+    // label which is used for showing a warning to client
+    // text field for putting username in it
+    // text field for putting password in it
+    // button which login
+    // an image for showing games' logo
     @FXML private Label warningLabel;
     @FXML private TextField usernameTextField;
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
     @FXML private ImageView logoImageView;
 
-    private LoginModel loginModel;
+    // is an executor for executing client-side server
+    // is a client-side server
+    private ExecutorService executor;
     private Client client;
 
 
@@ -39,10 +47,9 @@ public class LoginController {
      * this method initialize the login controller and model and view
      */
     public void initialize() {
+        executor = Executors.newCachedThreadPool();
         client = new Client();
-        Thread thread = new Thread(client);
-        thread.start();
-        loginModel = new LoginModel();
+        executor.execute(client);
         logoImageView.setImage(new Image("login/images/logo.jpg"));
     }
 

@@ -61,7 +61,7 @@ public class LoginModel {
                 preparedStatementInsert.setString(1, username);
                 preparedStatementInsert.setString(2, password);
                 preparedStatementInsert.setString(3, toString(newStatus));
-                preparedStatementInsert.execute(commandInsert);
+                preparedStatementInsert.executeUpdate();
                 return toString(newStatus);
             } else if (password.equals(resultSet.getString(2)))
                 return resultSet.getString(3);

@@ -1,20 +1,28 @@
 package game;
 
+import gameUtil.ShapeHolder;
 import gameUtil.AliveTroop;
 import gameUtil.BuildingName;
+import gameUtil.Spell;
 import gameUtil.Troop;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import mainMenu.MenuController;
 import player.Bot;
 import player.Client;
 import player.Player;
@@ -41,6 +49,7 @@ public class GameController implements EventHandler<MouseEvent> {
     public static long frameTimeInMilliseconds;
     private GameView gameView;
     private boolean isGameFinished = false;
+    @FXML private ButtonBar buttonBar;
     @FXML private Button card4Button;
     @FXML private Button card3Button;
     @FXML private Button card2Button;
@@ -77,6 +86,8 @@ public class GameController implements EventHandler<MouseEvent> {
      * this method initialize game
      */
     public void initialize(Client player1, Player player2) {
+        player1.getStatus().resetLists();
+        player2.getStatus().resetLists();
         client1 = player1;
         this.player2 = player2;
         var status1 = player1.getStatus();
@@ -107,7 +118,7 @@ public class GameController implements EventHandler<MouseEvent> {
                 int finalTime = time;
                 Platform.runLater(() -> timerLabel.setText(finalTime /60 + ":" + finalTime %60));
             }
-            indicateTheWinner();
+            Platform.runLater(this::indicateTheWinner);
         });
         Thread elixirThread = new Thread(() -> {
             while (true) {
@@ -122,38 +133,56 @@ public class GameController implements EventHandler<MouseEvent> {
                 }
             }
         });
-        Thread deadKing = new Thread(() -> {
-            AtomicBoolean isKingAlive = new AtomicBoolean(false);
-           client1.getStatus().getAliveAllyTroops().forEach(troop -> {
-               if (troop.getCard().getName().equals(BuildingName.KING_TOWER))
-                   isKingAlive.set(true);
-           });
-           if (!isKingAlive.get()) {
-               indicateTheWinner();
-           }
-            player2.getStatus().getAliveAllyTroops().forEach(troop -> {
-                if (troop.getCard().getName().equals(BuildingName.KING_TOWER))
-                    isKingAlive.set(true);
-            });
-            if (!isKingAlive.get()) {
-                indicateTheWinner();
-            }
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        Thread kingWatcher = new Thread(() -> {
+            while (true) {
+                try {Thread.sleep(500);
+                } catch (InterruptedException e) {e.printStackTrace();}
+                AtomicBoolean isKingAlive = new AtomicBoolean(false);
+                client1.getStatus().getAliveAllyTroops().forEach(troop -> {
+                    if (troop.getCard().getName().equals(BuildingName.KING_TOWER))
+                        isKingAlive.set(true);
+                });
+                if (!isKingAlive.get()) {
+                    Platform.runLater(this::indicateTheWinner);
+                }
+                player2.getStatus().getAliveAllyTroops().forEach(troop -> {
+                    if (troop.getCard().getName().equals(BuildingName.KING_TOWER))
+                        isKingAlive.set(true);
+                });
+                if (!isKingAlive.get()) {
+                    Platform.runLater(this::indicateTheWinner);
+                }
             }
         });
-        deadKing.start();
+        Thread crownCounter = new Thread(() -> {
+            while (true) {
+                Platform.runLater(() -> {
+                    blueCrownNumber.setText(String.valueOf(gameModel.getAllyCrown()));
+                    redCrownNumber.setText(String.valueOf(gameModel.getEnemyCrown()));
+                });
+                try {
+                    Thread.sleep(400);
+                } catch (InterruptedException e) {e.printStackTrace();}
+            }
+        });
+        crownCounter.start();
+        kingWatcher.start();
         timerThread.start();
         elixirThread.start();
+        if (player2 instanceof Bot) {
+            ((Bot) player2).connectToGame();
+            if (((Bot)player2).isSmart())
+                ((Bot)player2).playSmart();
+            else
+                ((Bot)player2).playNormally();
+        }
         nextCardImage.setFitHeight(60);
         nextCardImage.setFitWidth(45);
         componentUsernameLabel.setText(status2.getUsername());
         secondLayerPane = new AnchorPane();
         secondLayerPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.0)");
         gameModel = new GameModel();
-        gameModel.initialize(status1, status2);
+        gameModel.initialize(status1, player2);
         gameView = new GameView();
         gameView.initialize(gameModel);
         secondLayerPane.getChildren().add(gameView);
@@ -174,6 +203,15 @@ public class GameController implements EventHandler<MouseEvent> {
             public void handle(ActionEvent actionEvent) {
                 gameModel.setStack((Button)actionEvent.getTarget(),
                 gameModel.getPlayersStatus()[0].getCardsDeskInUse().get(4 + listedButtons.indexOf((Button)actionEvent.getTarget())));
+                firstLayer.getChildren().add(ShapeHolder.getTopRectangle());
+                status2.getAliveAllyTroops().forEach(troop -> {
+                    if (troop.getCard().getName().equals(BuildingName.ARCHER_TOWER)) {
+                        if (troop.getTroopLocation().getX() > 172)
+                            firstLayer.getChildren().add(ShapeHolder.getRightRectangle());
+                        else
+                            firstLayer.getChildren().add(ShapeHolder.getLeftRectangle());
+                    }
+                });
             }
         };
         listedButtons.forEach(button -> button.setOnAction(cardButtonAction));
@@ -193,6 +231,7 @@ public class GameController implements EventHandler<MouseEvent> {
         if (!isKingAlive(client1)) {
             client1.getStatus().addRecord(client1.getStatus().getUsername() + "(" + bluePoint + ")" + "   WON   " + "(" + 3 + ")" + player2.getStatus().getUsername());
             client1.getStatus().increaseXP(200);
+            client1.getStatus().increaseTrophy(20);
         }
         if (!isKingAlive(player2)) {
             client1.getStatus().addRecord(client1.getStatus().getUsername() + "(" + 3 + ")" + "   LOST   " + "(" + redPoint + ")" + player2.getStatus().getUsername());
@@ -201,6 +240,7 @@ public class GameController implements EventHandler<MouseEvent> {
         if (bluePoint > redPoint) {
             client1.getStatus().addRecord(client1.getStatus().getUsername() + "("  + bluePoint + ")" + "   WON   " + "(" + redPoint + ")" + player2.getStatus().getUsername());
             client1.getStatus().increaseXP(200);
+            client1.getStatus().increaseTrophy(20);
         } else if (bluePoint < redPoint) {
             client1.getStatus().addRecord(client1.getStatus().getUsername() + "("  + bluePoint + ")" + "   LOST   " + "(" + redPoint + ")" + player2.getStatus().getUsername());
             client1.getStatus().increaseXP(70);
@@ -220,6 +260,27 @@ public class GameController implements EventHandler<MouseEvent> {
             client1.sendCommand("<SAVE> " + toString(client1.getStatus()));
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        goToMainMenu();
+    }
+
+    /** this method switch from game to main menu. */
+    private void goToMainMenu() {
+        try {
+            Stage playerStage = new Stage();
+            FXMLLoader loader = new FXMLLoader();
+            Pane root = (Pane) loader.load(getClass().getResource("/mainMenu/menu.fxml").openStream());
+            MenuController menuController = loader.getController();
+            menuController.initialize(client1);
+            Scene scene = new Scene(root);
+            playerStage.setScene(scene);
+            playerStage.setTitle("Clash Royal");
+            playerStage.setResizable(false);
+            playerStage.show();
+            if (player2 instanceof Bot)
+                ((Bot) player2).disconnectFromGame();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -279,8 +340,12 @@ public class GameController implements EventHandler<MouseEvent> {
         if (mouseEvent.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
             if (gameModel.getStackedButton() != null &&
                 gameModel.getStackedCard() != null &&
-                GameModel.isValidCoordination(mouseLocation, player2.getStatus().getAliveAllyTroops()) &&
+                (GameModel.isValidCoordination(mouseLocation, player2.getStatus().getAliveAllyTroops()) ||
+                gameModel.getStackedCard() instanceof Spell) &&
                 gameModel.getStackedCard().getCost() <= client1.getStatus().getElixirs()) {
+                firstLayer.getChildren().remove(ShapeHolder.getLeftRectangle());
+                firstLayer.getChildren().remove(ShapeHolder.getRightRectangle());
+                firstLayer.getChildren().remove(ShapeHolder.getTopRectangle());
                 var cardDeskInUse = gameModel.getPlayersStatus()[0].getCardsDeskInUse();
                 var aliveAllyTroops = gameModel.getPlayersStatus()[0].getAliveAllyTroops();
                 var stackedCard = gameModel.getStackedCard();

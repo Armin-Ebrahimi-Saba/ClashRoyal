@@ -1,18 +1,19 @@
 package game;
 
+import gameUtil.ShapeHolder;
 import  javafx.geometry.Point2D;
 import gameUtil.*;
 import javafx.scene.control.Button;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import player.Bot;
 import player.Player;
 import player.Status;
-import server.Server;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static gameUtil.Target.GROUND;
 import static java.lang.Math.cos;
@@ -25,6 +26,9 @@ public class GameModel {
     // status of the both players
     // this button is stacked for some purposes (changing its image)
     // this card is stacked which might be transferred to AliveTroop
+    // indicate number of enemy crown
+    // indicate number of allys' crown
+    // player2 is the opponent of player1
     private static final float MINIMUM_DISTANCE = 45.0f;
     public static final Point2D MIDDLE_SECOND_LAYER = new Point2D(213.5,300);
     private Point2D LEFT_BRIDGE_HEAD;
@@ -35,6 +39,9 @@ public class GameModel {
     private Status statusPlayer2;
     private Button stackedButton;
     private Card stackedCard;
+    private int enemyCrown = 0;
+    private int allyCrown = 0;
+    private Player player2;
 
 
     /**
@@ -56,21 +63,26 @@ public class GameModel {
     /**
      * this method initialize the gameModel
      * @param status1 is player1 status
-     * @param status2 is player2 status
+     * @param player2 is player2
      */
-    public void initialize(Status status1 , Status status2) {
+    public void initialize(Status status1 , Player player2) {
         LEFT_BRIDGE_HEAD = new Point2D(37, 295);
         LEFT_BRIDGE_TAIL = new Point2D(37, 325);
         RIGHT_BRIDGE_HEAD = new Point2D(335, 295);
         RIGHT_BRIDGE_TAIL = new Point2D(335, 325);
+        this.player2 = player2;
         this.statusPlayer1 = status1;
-        this.statusPlayer2 = status2;
+        this.statusPlayer2 = player2.getStatus();
     }
 
     /**
      * this player takes a step
      */
     protected void step() {
+        if (player2 instanceof Bot) {
+            statusPlayer2.getAliveAllyTroops().addAll(statusPlayer2.getTroopsInWaitingList());
+            statusPlayer2.getTroopsInWaitingList().clear();
+        }
         statusPlayer1.setRelativeEnemyStatus(statusPlayer2);
         handleGame(statusPlayer1, statusPlayer1.getAliveEnemyTroops());
         statusPlayer2.setEnemyStatus(statusPlayer1);
@@ -79,8 +91,36 @@ public class GameModel {
         removeDeadTroops(statusPlayer1.getAliveEnemyTroops());
         removeDeadTroops(statusPlayer2.getAliveAllyTroops());
         removeDeadTroops(statusPlayer2.getAliveEnemyTroops());
+        indicateCrowns();
         statusPlayer2.getAliveAllyTroops().forEach(AliveTroop::updateReloadTimer);
         statusPlayer1.getAliveAllyTroops().forEach(AliveTroop::updateReloadTimer);
+    }
+
+    /**
+     * this method indicates the number of crowns for both sides
+     */
+    private void indicateCrowns() {
+        enemyCrown = countCrown(statusPlayer1.getAliveAllyTroops());
+        allyCrown = countCrown(statusPlayer2.getAliveAllyTroops());
+    }
+
+    /**
+     * count the number of crowns
+     * @param troops list of alive troops of the enemy
+     */
+    public int countCrown(ArrayList<AliveTroop> troops) {
+        AtomicInteger j = new AtomicInteger(3);
+        AtomicBoolean isEnemyKingAlive = new AtomicBoolean(true);
+        troops.forEach(troop -> {
+            if (troop.getCard().getName().equals(BuildingName.KING_TOWER)) {
+                isEnemyKingAlive.set(true);
+                j.addAndGet(-1);
+            } if (troop.getCard().getName().equals(BuildingName.ARCHER_TOWER))
+                j.addAndGet(-1);
+        });
+        if (!isEnemyKingAlive.get())
+            j.set(3);
+        return j.get();
     }
 
     /**
@@ -106,7 +146,10 @@ public class GameModel {
             if (!(troop.getCard() instanceof Spell)) {
                 if (!troop.isEngaged() || troop.getCard().isAreaSplash()) {
                     AliveTroop targetTroop = determineTargetInSight(troop, aliveEnemyTroops);
-                    determineVelocityDirection(troop, targetTroop, aliveEnemyTroops);
+                    if (allyStatus.equals(player2.getStatus()))
+                        determinePlayer2VelocityDirection(troop, targetTroop, aliveEnemyTroops);
+                    else
+                        determinePlayer1VelocityDirection(troop, targetTroop, aliveEnemyTroops);
                     ArrayList<AliveTroop> inRangeEnemy = determineTargetsInRange(troop, aliveEnemyTroops);
                     troop.setInRangeEnemies(inRangeEnemy);
                 }
@@ -293,7 +336,7 @@ public class GameModel {
      * @param targetTroop is the targeted troop
      * @param aliveEnemyTroops is the targets' status
      */
-    private void determineVelocityDirection(AliveTroop troop, AliveTroop targetTroop, ArrayList<AliveTroop> aliveEnemyTroops) {
+    private void determinePlayer1VelocityDirection(AliveTroop troop, AliveTroop targetTroop, ArrayList<AliveTroop> aliveEnemyTroops) {
         var troopLocation = troop.getTroopLocation();
         if (troop.getCard().getName().equals(BuildingName.ARCHER_TOWER) ||
             troop.getCard().getName().equals(BuildingName.KING_TOWER))
@@ -333,6 +376,56 @@ public class GameModel {
 
             double x = ((targetLocation != null ? targetLocation.getX() : 0) > troopLocation.getX() ? 1:-1) * (targetLocation != null ?
                        targetLocation.subtract(troopLocation).angle(new Point2D(0, -1)) : 0);
+            troop.setTroopVelocityDirection(new Point2D(sin(x/180 * Math.PI), -cos(x/180 * Math.PI)));
+        }
+    }
+
+    /**
+     * this method determines the velocity of a troop
+     * @param troop is the ally troop
+     * @param targetTroop is the targeted troop
+     * @param aliveEnemyTroops is the targets' status
+     */
+    private void determinePlayer2VelocityDirection(AliveTroop troop, AliveTroop targetTroop, ArrayList<AliveTroop> aliveEnemyTroops) {
+        var troopLocation = troop.getTroopLocation();
+        if (troop.getCard().getName().equals(BuildingName.ARCHER_TOWER) ||
+                troop.getCard().getName().equals(BuildingName.KING_TOWER))
+        {
+            if (troop.getTroopLocation().getY() > LEFT_BRIDGE_HEAD.getY())
+                troop.setTroopVelocityDirection(new Point2D(0, -1));
+            else
+                troop.setTroopVelocityDirection(new Point2D(0, 1));
+            return;
+        }
+        if (targetTroop == null && troopLocation.getY() >= LEFT_BRIDGE_TAIL.getY()) {
+            double x = 0;
+            if (!troop.getCard().getName().equals(TroopName.BABY_DRAGON)) {
+                if (troopLocation.distance(LEFT_BRIDGE_HEAD) <
+                        troopLocation.distance(RIGHT_BRIDGE_HEAD)) {
+                    x = (LEFT_BRIDGE_HEAD.getX() > troopLocation.getX() ? 1 : -1) * LEFT_BRIDGE_HEAD.subtract(troopLocation).angle(new Point2D(0, -1));
+                } else {
+                    x = (RIGHT_BRIDGE_HEAD.getX() > troopLocation.getX() ? 1 : -1) * RIGHT_BRIDGE_HEAD.subtract(troopLocation).angle(new Point2D(0, -1));
+                }
+            } else {
+                x = 0;
+            }
+            troop.setTroopVelocityDirection(new Point2D(sin(x/180 * Math.PI), -cos(x/180 * Math.PI)));
+        } else if (targetTroop == null &&
+                troopLocation.getY() < LEFT_BRIDGE_TAIL.getY() &&
+                troopLocation.getY() >= LEFT_BRIDGE_HEAD.getY() &&
+                (Math.abs(troopLocation.getX() - LEFT_BRIDGE_HEAD.getX()) < 5 ||
+                        Math.abs(troopLocation.getX() - RIGHT_BRIDGE_HEAD.getX()) < 5))
+        {
+            troop.setTroopVelocityDirection(new Point2D(0, 1));
+        } else {
+            Point2D targetLocation;
+            if (targetTroop != null)
+                targetLocation = targetTroop.getTroopLocation();
+            else
+                targetLocation = makeQueryForClosestTower(aliveEnemyTroops, troop);
+
+            double x = ((targetLocation != null ? targetLocation.getX() : 0) > troopLocation.getX() ? 1:-1) * (targetLocation != null ?
+                         targetLocation.subtract(troopLocation).angle(new Point2D(0, -1)) : 0);
             troop.setTroopVelocityDirection(new Point2D(sin(x/180 * Math.PI), -cos(x/180 * Math.PI)));
         }
     }
@@ -433,47 +526,21 @@ public class GameModel {
         Rectangle rectangle = new Rectangle(point2.getX(), point2.getY(), width, height);
         return !Shape.intersect(circle, rectangle).getBoundsInLocal().isEmpty();
     }
+
+    /**
+     * this is a getter
+     * @return number of crowns of enemy
+     */
+    public int getEnemyCrown() {
+        return enemyCrown;
+    }
+
+    /**
+     * this is a getter
+     * @return number of crowns of ally
+     */
+    public int getAllyCrown() {
+        return allyCrown;
+    }
 }
 
-/* this class hold shapes related to this games restricted ares. */
-class ShapeHolder {
-    private static double Y1 = 200;
-    private static double X1 = 213.5;
-    private static double height= 130;
-    private static Rectangle topRectangle = new Rectangle(0, 0, 2 * X1, Y1); // this area is always restricted.
-    private static Rectangle leftRectangle = new Rectangle(0, Y1, X1, height); // this area is not always restricted.
-    private static Rectangle rightRectangle = new Rectangle(X1, Y1, X1, height); // this area is not always restricted.
-    private static final Color color = new Color(255, 0, 0, (float) 0.4); // this color is for indicating restricted areas.
-
-    static {
-        topRectangle.setFill(color);
-        leftRectangle.setFill(color);
-        rightRectangle.setFill(color);
-    }
-
-    /**
-     * this is a getter
-     * @return top rectangle shape
-     */
-    public static Rectangle getTopRectangle() {
-        return topRectangle;
-    }
-
-    /**
-     * this is a getter
-     * @return left rectangle shape
-     */
-    public static Rectangle getLeftRectangle() {
-        return leftRectangle;
-    }
-
-    /**
-     * this is a getter
-     * @return right rectangle shape
-     */
-    public static Rectangle getRightRectangle() {
-        return rightRectangle;
-    }
-}
-//TODO babydragon movement
-//TODO infernoTower damaging

@@ -12,8 +12,9 @@ import java.util.ArrayList;
 public class Status implements Serializable {
     private ArrayList<Card> cards;
     private ArrayList<Card> cardsDeskInUse;
-    final transient private ArrayList<AliveTroop> aliveAllyTroops;
+    transient private ArrayList<AliveTroop> aliveAllyTroops;
     transient private ArrayList<AliveTroop> aliveEnemyTroops;
+    transient private ArrayList<AliveTroop> troopsInWaitingList;
     transient private String enemyUsername;
     transient private Status enemyStatus;
     private final String username;
@@ -33,13 +34,11 @@ public class Status implements Serializable {
         this.elixirs = 5;
         this.level = 1;
         this.XP = 0;
-        aliveAllyTroops = new ArrayList<>();
         cards = CardsCollection.getCardSet(1);
         cardsDeskInUse = new ArrayList<>();
         for (int i = 0; i < 8; i++)
             cardsDeskInUse.add(cards.get(i));
-        aliveEnemyTroops = new ArrayList<>();
-        resetTowers();
+        resetLists();
     }
 
     /**
@@ -53,8 +52,10 @@ public class Status implements Serializable {
     /**
      * this method reset towers in the list
      */
-    public void resetTowers() {
-        aliveAllyTroops.clear();
+    public void resetLists() {
+        aliveAllyTroops = new ArrayList<>();
+        aliveEnemyTroops = new ArrayList<>();
+        troopsInWaitingList = new ArrayList<>();
         aliveAllyTroops.add(new AliveTroop(CardsCollection.getArcherTowers().get(level - 1), new Point2D(33.0, 473)));
         aliveAllyTroops.add(new AliveTroop(CardsCollection.getArcherTowers().get(level - 1), new Point2D(324.0, 473)));
         aliveAllyTroops.add(new AliveTroop(CardsCollection.getKingTowers().get(level - 1), new Point2D(174.0, 567)));
@@ -218,6 +219,14 @@ public class Status implements Serializable {
      */
     public void addRecord(String record) {
         history.add(record);
+    }
+
+    /**
+     * this method is a getter
+     * @return troops in waiting list
+     */
+    public ArrayList<AliveTroop> getTroopsInWaitingList() {
+        return troopsInWaitingList;
     }
 }
 

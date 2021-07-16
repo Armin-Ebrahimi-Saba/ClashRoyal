@@ -50,13 +50,14 @@ public class Client extends Player implements Runnable {
     private void startMessageListener() throws InterruptedException {
         Thread listener = new Thread(this::readMessage);
         listener.start();
+        listener.join();
     }
 
     /**
      * this method read and get message from server
      */
     private void readMessage() {
-        String command = "";
+        String command;
         try {
             while((command = reader.readLine()) != null) {
                 lastRespond = command;

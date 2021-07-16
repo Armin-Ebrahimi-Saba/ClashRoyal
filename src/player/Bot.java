@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Bot extends Player {
-    private Status status;
     private boolean isSmart;
     private boolean isConnectedToGame = false;
 
@@ -19,28 +18,24 @@ public class Bot extends Player {
      * @param status is the Status of the bot player
      */
     public Bot(Status status, boolean isSmart) {
-        this.status = status;
+        setStatus(status);
         this.isSmart = isSmart;
-        if (isSmart)
-            playSmart();
-        else
-            playNormally();
     }
 
     /**
      * this method runs the bot to play smart
      */
-    private void playSmart() {
+    public void playSmart() {
         Thread play = new Thread(() -> {
             Point2D lPoint = new Point2D(144, 22);
             Point2D rPoint = new Point2D(208, 22);
             AliveTroop troop;
             while (isConnectedToGame) {
-                int rSumDifference = Math.abs(sumOfRightSideTroops(status.getAliveAllyTroops()) - sumOfRightSideTroops(status.getAliveEnemyTroops()));
-                int lSumDifference = Math.abs(sumOfLeftSideTroops(status.getAliveAllyTroops()) - sumOfLeftSideTroops(status.getAliveEnemyTroops()));
+                int rSumDifference = Math.abs(sumOfRightSideTroops(getStatus().getAliveAllyTroops()) - sumOfRightSideTroops(getStatus().getAliveEnemyTroops()));
+                int lSumDifference = Math.abs(sumOfLeftSideTroops(getStatus().getAliveAllyTroops()) - sumOfLeftSideTroops(getStatus().getAliveEnemyTroops()));
                 ArrayList<Card> chosenCards = new ArrayList<>();
-                for (Card card : status.getCardsDeskInUse()) {
-                    if (card.getCost() <= status.getElixirs())
+                for (Card card : getStatus().getCardsDeskInUse()) {
+                    if (card.getCost() <= getStatus().getElixirs())
                         chosenCards.add(card);
                 }
                 if (rSumDifference > lSumDifference) {
@@ -48,9 +43,18 @@ public class Bot extends Player {
                 } else {
                     troop = new AliveTroop(getClosestChoice(chosenCards, rSumDifference, false), rPoint);
                 }
-                status.getAliveAllyTroops().add(troop);
+                getStatus().getCardsDeskInUse().remove(troop.getCard());
+                getStatus().getCardsDeskInUse().add(0, troop.getCard());
+                getStatus().decreaseElixirs(troop.getCard().getCost());
+                for (int i = 0; i < (troop.getCard() instanceof Troop ? ((Troop) troop.getCard()).getCount() : 1); i++) {
+                    if (i % 2 == 0)
+                        getStatus().getTroopsInWaitingList().add(troop);
+                    if (i % 2 != 0)
+                        getStatus().getTroopsInWaitingList().add(troop);
+                }
             }
         });
+        play.start();
     }
 
     private Card getClosestChoice(ArrayList<Card> chosenCards, int lSumDifference, boolean isLeft) {
@@ -62,7 +66,7 @@ public class Bot extends Player {
                 difference = Math.abs(card.getCost() - lSumDifference);
             } else if (Math.abs(card.getCost() - lSumDifference) == difference) {
                 boolean isBabyDragon = false;
-                for (var troop : status.getAliveEnemyTroops()) {
+                for (var troop : getStatus().getAliveEnemyTroops()) {
                     if (troop.getTroopLocation().getX() < (isLeft ? 172 : 500) &&
                         troop.getTroopLocation().getX() > (isLeft ? 0 : 172) &&
                         troop.getCard().getName().equals(TroopName.BABY_DRAGON))
@@ -115,25 +119,35 @@ public class Bot extends Player {
     /**
      * this method runs the bot to play normal
      */
-    private void playNormally() {
+    public void playNormally() {
         Thread play = new Thread(() -> {
+            try {Thread.sleep(4000);
+            } catch (InterruptedException e) {e.printStackTrace();}
             while (isConnectedToGame) {
+                try {Thread.sleep(1000);
+                } catch (InterruptedException e) {e.printStackTrace();}
                 Random random = new Random();
-                var randomPoint = new Point2D(random.nextInt(475), random.nextInt(330));
-                if (!GameModel.isValidCoordination(randomPoint, status.getAliveEnemyTroops())) {
+                var randomPoint = new Point2D(random.nextInt(455), random.nextInt(280));
+                if (!GameModel.isValidCoordination(randomPoint, getStatus().getAliveEnemyTroops())) {
                     AtomicReference<Card> chosenCard = new AtomicReference<>();
-                    status.getCardsDeskInUse().forEach(card -> {
-                        if (card.getCost() <= status.getElixirs() &&
-                            status.getCardsDeskInUse().indexOf(card) > 3)
+                    getStatus().getCardsDeskInUse().forEach(card -> {
+                        if (card.getCost() <= getStatus().getElixirs() &&
+                            getStatus().getCardsDeskInUse().indexOf(card) > 3)
                         {
-                            status.getAliveAllyTroops().add(new AliveTroop(card, randomPoint));
                             chosenCard.set(card);
                         }
                     });
                     if (chosenCard.get() != null) {
-                        status.getCardsDeskInUse().remove(chosenCard.get());
-                        status.getCardsDeskInUse().add(0, chosenCard.get());
-                        status.getAliveAllyTroops().add(new AliveTroop(chosenCard.get(), status.getEnemyRelativePoint(randomPoint)));
+                        var troop = new AliveTroop(chosenCard.get(), getStatus().getEnemyRelativePoint(randomPoint));
+                        getStatus().getCardsDeskInUse().remove(troop.getCard());
+                        getStatus().getCardsDeskInUse().add(0, troop.getCard());
+                        getStatus().decreaseElixirs(troop.getCard().getCost());
+                        for (int i = 0; i < (troop.getCard() instanceof Troop ? ((Troop) troop.getCard()).getCount() : 1); i++) {
+                            if (i % 2 == 0)
+                                getStatus().getTroopsInWaitingList().add(troop);
+                            if (i % 2 != 0)
+                                getStatus().getTroopsInWaitingList().add(troop);
+                        }
                     }
                 }
                 try {
@@ -141,6 +155,7 @@ public class Bot extends Player {
                 } catch (InterruptedException e) {e.printStackTrace();}
             }
         });
+        play.start();
     }
 
     /**
@@ -155,5 +170,10 @@ public class Bot extends Player {
      */
     public void disconnectFromGame() {
         isConnectedToGame = false;
+    }
+
+    /* @return true if it is smart else false. */
+    public boolean isSmart() {
+        return isSmart;
     }
 }

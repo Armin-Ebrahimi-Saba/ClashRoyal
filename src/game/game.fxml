@@ -17,7 +17,7 @@
       <Button fx:id="tower1" layoutX="21.0" layoutY="473.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="83.0" style="-fx-background-color: rgba(0, 0, 0, 0.0);" />
       <Button fx:id="king1" layoutX="166.0" layoutY="567.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="83.0" style="-fx-background-color: rgba(0, 0, 0, 0.0);" />
       <Button fx:id="tower2" layoutX="324.0" layoutY="473.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="83.0" style="-fx-background-color: rgba(0, 0, 0, 0.0);" />
-      <ButtonBar layoutX="74.0" layoutY="654.0" prefHeight="80.0" prefWidth="350.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css">
+      <ButtonBar fx:id="buttonBar" layoutX="74.0" layoutY="654.0" prefHeight="80.0" prefWidth="350.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css">
          <buttons>
             <Button fx:id="card1Button" minWidth="62.0" mnemonicParsing="false" prefHeight="81.0" prefWidth="125.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
             <Button fx:id="card2Button" mnemonicParsing="false" prefHeight="104.0" prefWidth="107.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />

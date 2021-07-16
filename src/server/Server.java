@@ -200,11 +200,19 @@ public class Server {
         private final Server server;
         private ClientHandler componentsHandler;
 
+        /**
+         * this is a constructor
+         * @param connectionSocket is the connectionSocket between server and client
+         * @param server is the server which this handler is working for
+         */
         public ClientHandler(Socket connectionSocket, Server server) {
             this.connectionSocket = connectionSocket;
             this.server = server;
         }
 
+        /**
+         * this method runs the handler to handle a client
+         */
         @Override
         public void run() {
             try {
@@ -223,6 +231,9 @@ public class Server {
             listener.join();
         }
 
+        /**
+         * this method read message from client connection socket
+         */
         private void readMessage() {
             String line;
             try {
