@@ -34,6 +34,7 @@ public class Status implements Serializable {
         this.elixirs = 5;
         this.level = 1;
         this.XP = 0;
+        this.history = new ArrayList<>();
         cards = CardsCollection.getCardSet(1);
         cardsDeskInUse = new ArrayList<>();
         for (int i = 0; i < 8; i++)
@@ -74,6 +75,33 @@ public class Status implements Serializable {
      */
     public void increaseXP(int xp) {
         this.XP += xp;
+        if (level != getLevel()) {
+            cards = CardsCollection.getCardSet(getLevel());
+            cardsDeskInUse = new ArrayList<>();
+            for (int i = 4; i < 12; i++) {
+                cardsDeskInUse.add(CardsCollection.getCardSet(getLevel()).get(i));
+            }
+            level = getLevel();
+        }
+    }
+
+    /**
+     * this is a getter
+     * return amount of xp of the player
+     */
+    public double getXP() {
+        if (XP <= 300)
+            return XP/300.0;
+        else if (XP <= 800)
+            return (XP - 300)/500.0;
+        else if (XP <= 1700)
+            return (XP - 800)/900.0;
+        else if (XP <= 3400)
+            return (XP - 1700)/1700.0;
+        else if (XP <= 5900)
+            return (XP - 3400)/2500.0;
+        else
+            return 1;
     }
 
     /**
@@ -99,13 +127,13 @@ public class Status implements Serializable {
     public int getLevel() {
         if (XP <= 300)
             level = 1;
-        else if (XP <= 500)
+        else if (XP <= 800)
             level = 2;
-        else if (XP <= 900)
-            level = 3;
         else if (XP <= 1700)
+            level = 3;
+        else if (XP <= 3400)
             level = 4;
-        else if (XP <= 2500)
+        else if (XP <= 5900)
             level = 5;
         else
             level = 6;
@@ -157,7 +185,7 @@ public class Status implements Serializable {
         this.enemyStatus = enemyStatus;
         enemyStatus.getAliveAllyTroops().forEach(troop -> {
             if (!aliveEnemyTroops.contains(troop)) {
-                troop.setTroopLocation(getEnemyRelativePoint(troop.getTroopLocation()));
+                troop.setTroopLocation(getEnemyRelativePoint(troop.getLocation()));
                 aliveEnemyTroops.add(troop);
             }
         });

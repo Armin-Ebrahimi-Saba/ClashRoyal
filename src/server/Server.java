@@ -23,8 +23,8 @@ public class Server {
     private final ArrayList<ClientHandler> handlers;
     private final LoginModel loginModel;
     private final ArrayList<ClientHandler> battleWaitList = new ArrayList<>();
-    private final ArrayList<ClientHandler> twoOnTwoWaitList = new ArrayList<>();
-    private final ArrayList<ClientHandler[]> twoOnTwoPlayingList = new ArrayList<>();
+    private final ArrayList<ClientHandler> oneOnOneWaitList = new ArrayList<>();
+    private final ArrayList<ClientHandler[]> onOnOnePlayingList = new ArrayList<>();
 
     /**
      * this is a constructor
@@ -170,8 +170,8 @@ public class Server {
      * this method is a getter
      * @return waiting list for two on two battle
      */
-    public ArrayList<ClientHandler> getTwoOnTwoWaitList() {
-        return twoOnTwoWaitList;
+    public ArrayList<ClientHandler> getOneOnOneWaitList() {
+        return oneOnOneWaitList;
     }
 
     /**
@@ -186,8 +186,8 @@ public class Server {
      * this method is a getter
      * @return playing list for two on two battle
      */
-    public ArrayList<ClientHandler[]> getTwoOnTwoPlayingList() {
-        return twoOnTwoPlayingList;
+    public ArrayList<ClientHandler[]> getOneOnOnePlayingList() {
+        return onOnOnePlayingList;
     }
 
     /** this class handles the client*/
@@ -239,26 +239,32 @@ public class Server {
             try {
                 while ((line = reader.readLine()) != null) {
                     String command;
-                    if ((command = line.substring(line.indexOf("<") + 1, line.indexOf(">"))).equalsIgnoreCase("LOGIN")) {
+                    if ((command = line).contains("<LOGIN>")) {
                         var usernameAndPassword = line.split(" ");
                         encodedStatus = server.getLoginModel().validateUsernameAndPassword(usernameAndPassword[1], usernameAndPassword[2]);
                         sendRespondMessage(encodedStatus);
-                    } else if (command.equalsIgnoreCase("PLAY")) {
+                    } else if (command.contains("PLAY")) {
                         componentsHandler.sendRespondMessage(line);
                     } else if (command.equalsIgnoreCase("FIND_COMPONENT_1")) {
-                        server.getBattleWaitList().add(this);
                         Thread thread = new Thread(() -> {
                             while (true) {
-                                try {
-                                    Thread.sleep(150);
+                                try { Thread.sleep(150);
                                 } catch (InterruptedException e) {e.printStackTrace();}
-                                if (server.handlers.size() > 1) {
-                                    componentsHandler = chooseClient();
-                                    server.getTwoOnTwoPlayingList().add(new ClientHandler[]{this, componentsHandler});
-                                    sendRespondMessage("<READY> " + (componentsHandler != null ? componentsHandler.getEncodedStatus() : null));
+                                if (server.getBattleWaitList().size() > 1) {
+                                    componentsHandler = chooseComponentHandler();
+                                    componentsHandler.setComponentsHandler(this);
+                                    server.getOneOnOnePlayingList().add(new ClientHandler[]{this, componentsHandler});
+                                    sendRespondMessage("<READY> " + componentsHandler.getEncodedStatus());
                                     break;
-                                } else
+                                } else if (componentsHandler != null) {
+                                    sendRespondMessage("<READY> " + componentsHandler.getEncodedStatus());
+                                    break;
+                                } else {
+                                    try { Thread.sleep(450);
+                                    } catch (InterruptedException e) {e.printStackTrace();}
+                                    server.getBattleWaitList().add(this);
                                     sendRespondMessage("<!READY>");
+                                }
                             }
                         });
                         thread.start();
@@ -291,19 +297,20 @@ public class Server {
          * this method choose the client
          * @return encoded status of opponent of client of this handler
          */
-        private ClientHandler chooseClient() {
+        private ClientHandler chooseComponentHandler() {
             final ClientHandler[] handler = new ClientHandler[1];
             server.getBattleWaitList().forEach(clientHandler -> {
                 if (clientHandler != this)
                     handler[0] = clientHandler;
             });
             server.getBattleWaitList().remove(handler[0]);
-            return null;
+            server.getBattleWaitList().remove(this);
+            return handler[0];
         }
 
         /**
-         * this method sends a respond message from server to client
-         * @param message is the message which will be sent
+         * this method sends a respond message from server to client.
+         * @param message is the message which will be sent.
          */
         public void sendRespondMessage(String message) {
             try {
@@ -311,6 +318,14 @@ public class Server {
             } catch(IOException ex) {
                 ex.printStackTrace();
             }
+        }
+
+        /**
+         * this method is a setter
+         * @param componentsHandler is a component handler
+         */
+        public void setComponentsHandler(ClientHandler componentsHandler) {
+            this.componentsHandler = componentsHandler;
         }
 
         /**

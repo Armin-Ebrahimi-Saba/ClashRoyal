@@ -2,6 +2,7 @@ package player;
 
 import gameUtil.AliveTroop;
 import gameUtil.Card;
+import gameUtil.Troop;
 import javafx.geometry.Point2D;
 
 import java.io.*;
@@ -62,24 +63,25 @@ public class Client extends Player implements Runnable {
             while((command = reader.readLine()) != null) {
                 lastRespond = command;
                 if (lastRespond.contains("PLAY")) {
+                    System.out.println("Received");
                     String[] partitions = command.split(" ", 4);
                     Point2D point = new Point2D(
                             Double.parseDouble(partitions[1]),
                             Double.parseDouble(partitions[2]));
-                    AliveTroop aliveTroop =
-                            new AliveTroop((Card)fromString(partitions[3]), point);
-                    status.getEnemyStatus().getAliveAllyTroops().add(aliveTroop);
+                    Card card = (Card)fromString(partitions[3]);
+                    for (int i = 0; i < (card instanceof Troop ? ((Troop) card).getCount() : 1); i++) {
+                        if (i % 2 == 0)
+                            status.getEnemyStatus().getAliveAllyTroops().
+                                    add(new AliveTroop(card,
+                                    new Point2D(point.getX() + 20 * i, point.getY())));
+                        if (i % 2 != 0)
+                            status.getEnemyStatus().getAliveAllyTroops().
+                                    add(new AliveTroop(card,
+                                    new Point2D(point.getX(), point.getY() + 20 * i)));
+                    }
                 }
             }
         } catch(IOException | ClassNotFoundException ex) {ex.printStackTrace();}
-    }
-
-    /**
-     * this method parse this command and execute it
-     * @param command is the which should be parsed and then executed
-     */
-    private void parseAndExecuteCommand(String command) {
-
     }
 
     /**
@@ -105,11 +107,6 @@ public class Client extends Player implements Runnable {
     /** this change player from being second to first or visa versa. */
     public void changeTurn () {
         isSecondPlayer = !isSecondPlayer;
-    }
-
-    /** this method checks if this client is the second player at its current game. */
-    public boolean isFirstPlayer() {
-        return !isSecondPlayer;
     }
 
     /** Write the object to a Base64 string. */

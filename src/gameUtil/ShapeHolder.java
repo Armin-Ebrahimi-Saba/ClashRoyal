@@ -7,7 +7,7 @@ import javafx.scene.shape.Rectangle;
 public class ShapeHolder {
     private static double Y1 = 200;
     private static double X1 = 213.5;
-    private static double height = 130;
+    private static double height = 140;
     private static Rectangle topRectangle = new Rectangle(0, 0, 2 * X1, Y1); // this area is always restricted.
     private static Rectangle leftRectangle = new Rectangle(0, Y1, X1, height); // this area is not always restricted.
     private static Rectangle rightRectangle = new Rectangle(X1, Y1, X1, height); // this area is not always restricted.

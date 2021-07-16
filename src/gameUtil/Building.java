@@ -120,14 +120,6 @@ public class Building extends Card implements Serializable {
     }
 
     /**
-     * this is a getter
-     * @return name of this building
-     */
-    public BuildingName getBuildingName() {
-        return buildingName;
-    }
-
-    /**
      * this method is a setter
      * @param buildingName is the name of the building
      */

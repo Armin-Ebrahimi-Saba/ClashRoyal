@@ -10,10 +10,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.Label;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -37,6 +34,7 @@ public class MenuController {
     private MenuModel menuModel;
     private HashMap<Button, Card> linkedButtons;
 
+    @FXML private ProgressBar xpBar;
     @FXML private Button battleButton;
     @FXML private Button normalBotButton;
     @FXML private Button smartBotButton;
@@ -85,6 +83,7 @@ public class MenuController {
         usernameLabel.setText(menuModel.getStatus().getUsername());
         trophyLabel.setText(String.valueOf(menuModel.getStatus().getTrophy()));
         levelLabel.setText(String.valueOf(menuModel.getStatus().getLevel()));
+        xpBar.setProgress(menuModel.getStatus().getXP());
 
         ArrayList<Card> cardsNotInUse = (ArrayList<Card>) menuModel.getStatus().getCards().clone();
         cardsNotInUse.removeAll(menuModel.getStatus().getCardsDeskInUse());
@@ -97,7 +96,7 @@ public class MenuController {
             setButtonImage(linkedButtons.get(button).getCardAddress(), button);
         }
 
-        EventHandler<ActionEvent> normalBotButtonEvent = new EventHandler<>() {
+        EventHandler<ActionEvent> botButtonOnClick = new EventHandler<>() {
             public void handle(ActionEvent e) {
                 try {
                     menuModel.getStatus().getCardsDeskInUse().clear();
@@ -110,7 +109,10 @@ public class MenuController {
                     FXMLLoader loader = new FXMLLoader();
                     Pane root = loader.load(getClass().getResource("/game/game.fxml").openStream());
                     GameController gameController = loader.getController();
-                    gameController.initialize(client, new Bot(new Status("EasyBot"), false));
+                    if (e.getTarget().equals(normalBotButton))
+                        gameController.initialize(client, new Bot(new Status("EasyBot"), false));
+                    else if (e.getTarget().equals(smartBotButton))
+                        gameController.initialize(client, new Bot(new Status("SmartBot"), true));
                     Scene scene = new Scene(root);
                     playerStage.setScene(scene);
                     playerStage.setTitle("Clash Royal");
@@ -122,49 +124,21 @@ public class MenuController {
                 }
             }
         };
-        normalBotButton.setOnAction(normalBotButtonEvent);
-
-        EventHandler<ActionEvent> smartBotButtonEvent = new EventHandler<>() {
-            public void handle(ActionEvent e) {
-                try {
-                    menuModel.getStatus().getCardsDeskInUse().clear();
-                    linkedButtons.remove(button9);
-                    linkedButtons.remove(button10);
-                    linkedButtons.remove(button11);
-                    linkedButtons.remove(button12);
-                    menuModel.getStatus().getCardsDeskInUse().addAll(linkedButtons.values());
-                    Stage playerStage = new Stage();
-                    FXMLLoader loader = new FXMLLoader();
-                    Pane root = loader.load(getClass().getResource("/game/game.fxml").openStream());
-                    GameController gameController = loader.getController();
-                    gameController.initialize(client, new Bot(new Status("SmartBot"), true));
-                    Scene scene = new Scene(root);
-                    playerStage.setScene(scene);
-                    playerStage.setTitle("Clash Royal");
-                    root.setOnMouseClicked(gameController);
-                    playerStage.setResizable(false);
-                    playerStage.show();
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
-            }
-        };
-        smartBotButton.setOnAction(smartBotButtonEvent);
-
+        normalBotButton.setOnAction(botButtonOnClick);
+        smartBotButton.setOnAction(botButtonOnClick);
         EventHandler<ActionEvent> battleButtonEvent = new EventHandler<>() {
             String s;
             public void handle(ActionEvent e) {
                 try {
                     Thread thread = new Thread(() -> {
                         while (!(s = client.getLastRespond()).contains("<READY>")) {
-                            try {
-                                Thread.sleep(150);
-                            } catch (InterruptedException interruptedException) {
-                                interruptedException.printStackTrace();
-                            }
+                            System.out.println(s);
+                            try {Thread.sleep(150);
+                            } catch (InterruptedException interruptedException) {interruptedException.printStackTrace();}
                         }
                     });
                     thread.start();
+                    client.sendCommand("FIND_COMPONENT_1");
                     thread.join();
                     menuModel.getStatus().getCardsDeskInUse().clear();
                     linkedButtons.remove(button9);

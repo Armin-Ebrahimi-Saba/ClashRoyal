@@ -2,12 +2,13 @@ package game;
 
 import gameUtil.AliveTroop;
 import gameUtil.BuildingName;
-import javafx.animation.TranslateTransition;
+import gameUtil.SpellName;
 import javafx.geometry.Point2D;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
 
@@ -69,17 +70,33 @@ public class GameView extends Pane {
         for (var troop : model.getPlayersStatus()[0].getAliveEnemyTroops()) {
             if (troop.isAlive())
             {
-                var imageView = creatImageView(troop);
-                secondLayerCellViews.add(imageView);
-                this.getChildren().add(imageView);
+                if (troop.getCard().getName().equals(SpellName.RAGE)) {
+                    Circle circle = new Circle(troop.getLocation().getX(),
+                            troop.getLocation().getY(),
+                            troop.getCard().getRange());
+                    circle.setFill(new Color(1, 0, 1, 0.4));
+                    this.getChildren().add(circle);
+                } else {
+                    var imageView = creatImageView(troop);
+                    secondLayerCellViews.add(imageView);
+                    this.getChildren().add(imageView);
+                }
             }
         }
         for (var troop : model.getPlayersStatus()[0].getAliveAllyTroops()) {
             if (troop.isAlive())
             {
-                var imageView = creatImageView(troop);
-                secondLayerCellViews.add(imageView);
-                this.getChildren().add(imageView);
+                if (troop.getCard().getName().equals(SpellName.RAGE)) {
+                    Circle circle = new Circle(troop.getLocation().getX(),
+                            troop.getLocation().getY(),
+                            troop.getCard().getRange());
+                    circle.setFill(new Color(1, 0, 1, 0.4));
+                    this.getChildren().add(circle);
+                } else {
+                    var imageView = creatImageView(troop);
+                    secondLayerCellViews.add(imageView);
+                    this.getChildren().add(imageView);
+                }
             }
         }
     }
@@ -93,8 +110,8 @@ public class GameView extends Pane {
         ImageView imageView = new ImageView();
         Image image = new Image(troop.getCard().getCharacterImageAddress());
         imageView.setImage(image);
-        imageView.setLayoutX(troop.getTroopLocation().getX());
-        imageView.setLayoutY(troop.getTroopLocation().getY());
+        imageView.setLayoutX(troop.getLocation().getX());
+        imageView.setLayoutY(troop.getLocation().getY());
         imageView.setSmooth(true);
         imageView.setCache(true);
         if (troop.getTroopVelocityDirection() != null)

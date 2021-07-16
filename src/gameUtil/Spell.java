@@ -35,7 +35,7 @@ public class Spell extends Card implements Serializable {
      */
     @Override
     public Object getName() {
-        return null;
+        return spellName;
     }
 
     /**

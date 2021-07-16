@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GameController implements EventHandler<MouseEvent> {
+    private TimerTask timerTask;
     private GameModel gameModel;
     private Client client1;
     private Player player2;
@@ -69,6 +70,7 @@ public class GameController implements EventHandler<MouseEvent> {
     @FXML private ProgressBar elixirBar;
     @FXML private ImageView nextCardImage;
     @FXML private ImageView elixirImage;
+    @FXML private Label elixirCount;
 
     /**
      * this is a constructor
@@ -102,11 +104,12 @@ public class GameController implements EventHandler<MouseEvent> {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if (counter1 == 2) {
+                if (counter1 == (time > 60 ? 2 : 1)) {
                     status1.increaseElixirs();
+                    Platform.runLater(() -> elixirCount.setText(String.valueOf(status1.getElixirs())));
                     counter1 = 0;
                 }
-                if (counter2 == 2) {
+                if (counter2 == (time > 60 ? 2 : 1)) {
                     status2.increaseElixirs();
                     counter2 = 0;
                 }
@@ -116,7 +119,12 @@ public class GameController implements EventHandler<MouseEvent> {
                     counter2++;
                 time--;
                 int finalTime = time;
-                Platform.runLater(() -> timerLabel.setText(finalTime /60 + ":" + finalTime %60));
+                Platform.runLater(() -> timerLabel.setText(finalTime /60 + ":" + String.format("%02d", finalTime %60)));
+                if (time < 60) {
+                    Platform.runLater(() -> timerLabel.setStyle("-fx-text-fill: Red"));
+                    Platform.runLater(() -> timerLabel.setStyle("-fx-font-weight: Bold"));
+                    Platform.runLater(() -> timerLabel.setStyle("-fx-font-size: 22"));
+                }
             }
             Platform.runLater(this::indicateTheWinner);
         });
@@ -144,6 +152,7 @@ public class GameController implements EventHandler<MouseEvent> {
                 });
                 if (!isKingAlive.get()) {
                     Platform.runLater(this::indicateTheWinner);
+                    return;
                 }
                 player2.getStatus().getAliveAllyTroops().forEach(troop -> {
                     if (troop.getCard().getName().equals(BuildingName.KING_TOWER))
@@ -151,6 +160,7 @@ public class GameController implements EventHandler<MouseEvent> {
                 });
                 if (!isKingAlive.get()) {
                     Platform.runLater(this::indicateTheWinner);
+                    return;
                 }
             }
         });
@@ -193,24 +203,27 @@ public class GameController implements EventHandler<MouseEvent> {
         listedButtons.add(card4Button);
         for (int i = 0; i < 4; i++)
             setButtonImage(listedButtons.get(i), gameModel.getPlayersStatus()[0].getCardsDeskInUse().get(4 + i).getCardAddress());
-        client1 = new Client();
-        client1.setStatus(status1);
         firstLayer.getChildren().add(gameView);
         startTimer();
 
         EventHandler<ActionEvent> cardButtonAction = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                gameModel.setStack((Button)actionEvent.getTarget(),
-                gameModel.getPlayersStatus()[0].getCardsDeskInUse().get(4 + listedButtons.indexOf((Button)actionEvent.getTarget())));
-                firstLayer.getChildren().add(ShapeHolder.getTopRectangle());
-                status2.getAliveAllyTroops().forEach(troop -> {
-                    if (troop.getCard().getName().equals(BuildingName.ARCHER_TOWER)) {
-                        if (troop.getTroopLocation().getX() > 172)
-                            firstLayer.getChildren().add(ShapeHolder.getRightRectangle());
-                        else
-                            firstLayer.getChildren().add(ShapeHolder.getLeftRectangle());
-                    }
+                Platform.runLater(() -> {
+                    gameModel.setStack((Button) actionEvent.getTarget(),
+                            gameModel.getPlayersStatus()[0].getCardsDeskInUse().get(4 + listedButtons.indexOf((Button) actionEvent.getTarget())));
+                    if (!firstLayer.getChildren().contains(ShapeHolder.getTopRectangle()))
+                        firstLayer.getChildren().add(ShapeHolder.getTopRectangle());
+                    status2.getAliveAllyTroops().forEach(troop -> {
+                        if (troop.getCard().getName().equals(BuildingName.ARCHER_TOWER)) {
+                            if (!firstLayer.getChildren().contains(ShapeHolder.getRightRectangle()) &&
+                                    troop.getLocation().getX() > 172)
+                                firstLayer.getChildren().add(ShapeHolder.getRightRectangle());
+                            else if (!firstLayer.getChildren().contains(ShapeHolder.getLeftRectangle()) &&
+                                    troop.getLocation().getX() < 172)
+                                firstLayer.getChildren().add(ShapeHolder.getLeftRectangle());
+                        }
+                    });
                 });
             }
         };
@@ -221,6 +234,7 @@ public class GameController implements EventHandler<MouseEvent> {
      * this method indicates the winner
      */
     private void indicateTheWinner() {
+        timerTask.cancel();
         timer.cancel();
         if (player2 instanceof Bot) {
             ((Bot)player2).disconnectFromGame();
@@ -334,9 +348,6 @@ public class GameController implements EventHandler<MouseEvent> {
     @Override
     public void handle(MouseEvent mouseEvent) {
         Point2D mouseLocation = new Point2D(mouseEvent.getSceneX(), mouseEvent.getSceneY());
-        System.out.println("mouse clicked first");
-        System.out.println(gameModel.getStackedButton());
-        System.out.println(gameModel.getStackedCard());
         if (mouseEvent.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
             if (gameModel.getStackedButton() != null &&
                 gameModel.getStackedCard() != null &&
@@ -363,17 +374,17 @@ public class GameController implements EventHandler<MouseEvent> {
                     setButtonImage(listedButtons.get(i), cardDeskInUse.get(4 + i).getCardAddress());
                 nextCardImage.setImage(new Image(cardDeskInUse.get(3).getCardAddress()));
                 client1.getStatus().decreaseElixirs(gameModel.getStackedCard().getCost());
-                gameModel.resetStack();
                 if (player2 instanceof Client) {
                     try {
                         client1.sendCommand("<PLAY> " + mouseLocation.getX() + " "
                                                       + mouseLocation.getY() + " "
                                                       + toString(gameModel.getStackedCard()));
+                        System.out.println("sent");
                     } catch (IOException e) {e.printStackTrace();}
                 }
+                gameModel.resetStack();
             }
         }
-        mouseEvent.consume();
     }
 
     /** Write the object to a Base64 string. */
@@ -390,7 +401,7 @@ public class GameController implements EventHandler<MouseEvent> {
      */
     private void startTimer() {
         this.timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
+        timerTask = new TimerTask() {
             public void run() {
                 Platform.runLater(() -> update());
             }
@@ -406,7 +417,6 @@ public class GameController implements EventHandler<MouseEvent> {
         gameModel.step();
         gameView.update(gameModel);
     }
-
 
     /**
      * this is a getter

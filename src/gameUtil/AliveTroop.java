@@ -29,12 +29,28 @@ public class AliveTroop implements Serializable {
      * @param card  is the card which is indicated to this alive troop
      */
     public AliveTroop(Card card, Point2D initialLocation) {
+        if (card instanceof Building) {
+            startLifeTimeTimer((Building) card);
+        }
         this.engagedTime = 0;
         this.hitTimer = 0;
         this.card = card;
         this.HP = card.getHP();
         this.timeLeft = card.getDamage() * 100;
         this.troopLocation = initialLocation;
+    }
+
+    private void startLifeTimeTimer(Building card) {
+        Thread thread = new Thread (() -> {
+            int timer = card.getLifeTime();
+            while (timer > 0) {
+                try {Thread.sleep(1000);
+                } catch (InterruptedException e) {e.printStackTrace();}
+                timer--;
+            }
+            reduceHP(20000);
+        });
+        thread.start();
     }
 
     /**
@@ -56,7 +72,7 @@ public class AliveTroop implements Serializable {
     /**
      * this is a getter which returns location of the troop
      */
-    public Point2D getTroopLocation() {
+    public Point2D getLocation() {
         return troopLocation;
     }
 
@@ -112,10 +128,6 @@ public class AliveTroop implements Serializable {
      */
     public void setInRangeEnemies(ArrayList<AliveTroop> inRangeEnemies) {
         this.inRangeEnemies = inRangeEnemies;
-//        inRangeEnemies.forEach(troop -> {
-//            if (!this.inRangeEnemies.contains(troop))
-//                this.inRangeEnemies.add(troop);
-//        });
     }
 
     /**
@@ -161,14 +173,18 @@ public class AliveTroop implements Serializable {
      * @return damage of the troop
      */
     public double getDamage() {
-        if (booster != null && !booster.isDurationFinished()) {
+        if (isReadyForDamaging()) {
+            if (booster != null && !booster.isDurationFinished()) {
+                if (card.getName().equals(BuildingName.INFERNO_TOWER))
+                    return (card.getDamage() + ((((Building) card).getMaxDamage() - card.getDamage()) / 3.0) * engagedTime) * 1.4;
+                return card.getDamage() * 1.4;
+            }
             if (card.getName().equals(BuildingName.INFERNO_TOWER))
-                return (card.getDamage() + ((((Building)card).getMaxDamage() - card.getDamage())/3.0) * engagedTime) * 1.4;
-            return card.getDamage() * 1.4;
+                return card.getDamage() + ((((Building) card).getMaxDamage() - card.getDamage()) / 3.0) * engagedTime;
+            return card.getDamage();
         }
-        if (card.getName().equals(BuildingName.INFERNO_TOWER))
-            return card.getDamage() + ((((Building)card).getMaxDamage() - card.getDamage())/3.0) * engagedTime;
-        return card.getDamage();
+        booster = null;
+        return 0;
     }
 
     /**
@@ -191,9 +207,9 @@ public class AliveTroop implements Serializable {
      * this method indicates weather troop is ready for attacking or not
      * @return true if it is ready for attacking otherwise false
      */
-    public boolean isReadyForDamaging() {
+    private boolean isReadyForDamaging() {
         if (hitTimer <= 0) {
-            hitTimer = 1/card.getHitSpeed();
+            hitTimer = card.getHitSpeed();
             return true;
         }
         return false;

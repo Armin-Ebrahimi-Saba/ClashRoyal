@@ -27,93 +27,40 @@ public class Bot extends Player {
      */
     public void playSmart() {
         Thread play = new Thread(() -> {
-            Point2D lPoint = new Point2D(144, 22);
-            Point2D rPoint = new Point2D(208, 22);
-            AliveTroop troop;
+            try {Thread.sleep(4000);
+            } catch (InterruptedException e) {e.printStackTrace();}
+            Point2D lPoint = new Point2D(70, 60);
+            Point2D rPoint = new Point2D(270, 60);
+            AliveTroop troop = null;
             while (isConnectedToGame) {
+                try {Thread.sleep(1000);
+                } catch (InterruptedException e) {e.printStackTrace();}
                 int rSumDifference = Math.abs(sumOfRightSideTroops(getStatus().getAliveAllyTroops()) - sumOfRightSideTroops(getStatus().getAliveEnemyTroops()));
                 int lSumDifference = Math.abs(sumOfLeftSideTroops(getStatus().getAliveAllyTroops()) - sumOfLeftSideTroops(getStatus().getAliveEnemyTroops()));
                 ArrayList<Card> chosenCards = new ArrayList<>();
-                for (Card card : getStatus().getCardsDeskInUse()) {
+                for (Card card : getStatus().getCardsDeskInUse().subList(4, 7)) {
                     if (card.getCost() <= getStatus().getElixirs())
                         chosenCards.add(card);
                 }
                 if (rSumDifference > lSumDifference) {
-                    troop = new AliveTroop(getClosestChoice(chosenCards, lSumDifference, true), lPoint);
+                    var card = getClosestChoice(chosenCards, lSumDifference, true);
+                    if (card != null)
+                        troop = new AliveTroop(card, lPoint);
                 } else {
-                    troop = new AliveTroop(getClosestChoice(chosenCards, rSumDifference, false), rPoint);
+                    var card = getClosestChoice(chosenCards, rSumDifference, false);
+                    if (card != null)
+                        troop = new AliveTroop(card, rPoint);
                 }
-                getStatus().getCardsDeskInUse().remove(troop.getCard());
-                getStatus().getCardsDeskInUse().add(0, troop.getCard());
-                getStatus().decreaseElixirs(troop.getCard().getCost());
-                for (int i = 0; i < (troop.getCard() instanceof Troop ? ((Troop) troop.getCard()).getCount() : 1); i++) {
-                    if (i % 2 == 0)
-                        getStatus().getTroopsInWaitingList().add(troop);
-                    if (i % 2 != 0)
-                        getStatus().getTroopsInWaitingList().add(troop);
+                if (troop != null) {
+                    var card = troop.getCard();
+                    var point = troop.getLocation();
+                    if (card != null)
+                        addCardToWaitingList(point, card);
                 }
+                troop = null;
             }
         });
         play.start();
-    }
-
-    private Card getClosestChoice(ArrayList<Card> chosenCards, int lSumDifference, boolean isLeft) {
-        Card bestCard = null;
-        int difference = 1000;
-        for (Card card : chosenCards) {
-            if (Math.abs(card.getCost() - lSumDifference) < difference) {
-                bestCard = card;
-                difference = Math.abs(card.getCost() - lSumDifference);
-            } else if (Math.abs(card.getCost() - lSumDifference) == difference) {
-                boolean isBabyDragon = false;
-                for (var troop : getStatus().getAliveEnemyTroops()) {
-                    if (troop.getTroopLocation().getX() < (isLeft ? 172 : 500) &&
-                        troop.getTroopLocation().getX() > (isLeft ? 0 : 172) &&
-                        troop.getCard().getName().equals(TroopName.BABY_DRAGON))
-                    {
-                        isBabyDragon = true;
-                        break;
-                    }
-                }
-                if (isBabyDragon &&
-                    card.getTarget().equals(Target.ANY) && !bestCard.getTarget().equals(Target.ANY)) {
-                    bestCard = card;
-                } else if (card.getCost() < bestCard.getCost()) {
-                    bestCard = card;
-                }
-            }
-        }
-        return bestCard;
-    }
-
-    /**
-     * this method return sum of cost of all left side of area troops
-     * @param troops is the list of those troops
-     * @return sum of those troops
-     */
-    private int sumOfLeftSideTroops(ArrayList<AliveTroop> troops) {
-        AtomicInteger sum = new AtomicInteger();
-        troops.forEach(troop -> {
-            if (troop.getTroopLocation().getX() < 172) {
-                sum.addAndGet(troop.getCard().getCost());
-            }
-        });
-        return sum.get();
-    }
-
-    /**
-     * this method return sum of cost of all right side of area troops
-     * @param troops is the list of those troops
-     * @return sum of those troops
-     */
-    private int sumOfRightSideTroops(ArrayList<AliveTroop> troops) {
-        AtomicInteger sum = new AtomicInteger();
-        troops.forEach(troop -> {
-            if (troop.getTroopLocation().getX() > 172) {
-                sum.addAndGet(troop.getCard().getCost());
-            }
-        });
-        return sum.get();
     }
 
     /**
@@ -132,22 +79,14 @@ public class Bot extends Player {
                     AtomicReference<Card> chosenCard = new AtomicReference<>();
                     getStatus().getCardsDeskInUse().forEach(card -> {
                         if (card.getCost() <= getStatus().getElixirs() &&
-                            getStatus().getCardsDeskInUse().indexOf(card) > 3)
+                                getStatus().getCardsDeskInUse().indexOf(card) > 3)
                         {
                             chosenCard.set(card);
                         }
                     });
                     if (chosenCard.get() != null) {
-                        var troop = new AliveTroop(chosenCard.get(), getStatus().getEnemyRelativePoint(randomPoint));
-                        getStatus().getCardsDeskInUse().remove(troop.getCard());
-                        getStatus().getCardsDeskInUse().add(0, troop.getCard());
-                        getStatus().decreaseElixirs(troop.getCard().getCost());
-                        for (int i = 0; i < (troop.getCard() instanceof Troop ? ((Troop) troop.getCard()).getCount() : 1); i++) {
-                            if (i % 2 == 0)
-                                getStatus().getTroopsInWaitingList().add(troop);
-                            if (i % 2 != 0)
-                                getStatus().getTroopsInWaitingList().add(troop);
-                        }
+                        var card = chosenCard.get();
+                        addCardToWaitingList(randomPoint, card);
                     }
                 }
                 try {
@@ -156,6 +95,91 @@ public class Bot extends Player {
             }
         });
         play.start();
+    }
+
+    /**
+     * this method get the card closest choice for smart bot
+     * @param chosenCards is the list of choices for card
+     * @param sumDifference is an effective parameter
+     * @param isLeft if the troop is going to be on left or right
+     * @return the best card for playing
+     */
+    private Card getClosestChoice(ArrayList<Card> chosenCards, int sumDifference, boolean isLeft) {
+        Card bestCard = null;
+        int difference = 1000;
+        for (Card card : chosenCards) {
+            if (Math.abs(card.getCost() - sumDifference) < difference) {
+                bestCard = card;
+                difference = Math.abs(card.getCost() - sumDifference);
+            } else if (Math.abs(card.getCost() - sumDifference) == difference) {
+                boolean isBabyDragon = false;
+                for (var troop : getStatus().getAliveEnemyTroops()) {
+                    if (troop.getLocation().getX() < (isLeft ? 172 : 330) &&
+                            troop.getLocation().getX() > (isLeft ? 0 : 172) &&
+                            troop.getCard().getName().equals(TroopName.BABY_DRAGON))
+                    {
+                        isBabyDragon = true;
+                        break;
+                    }
+                }
+                if (isBabyDragon &&
+                        card.getTarget().equals(Target.ANY) && !bestCard.getTarget().equals(Target.ANY)) {
+                    bestCard = card;
+                } else if (card.getCost() < bestCard.getCost()) {
+                    bestCard = card;
+                }
+            }
+        }
+        return bestCard;
+    }
+
+    /**
+     * this method return sum of cost of all left side of area troops
+     * @param troops is the list of those troops
+     * @return sum of those troops
+     */
+    private int sumOfLeftSideTroops(ArrayList<AliveTroop> troops) {
+        AtomicInteger sum = new AtomicInteger();
+        troops.forEach(troop -> {
+            if (troop.getLocation().getX() < 172) {
+                sum.addAndGet(troop.getCard().getCost());
+            }
+        });
+        return sum.get();
+    }
+
+    /**
+     * this method return sum of cost of all right side of area troops
+     * @param troops is the list of those troops
+     * @return sum of those troops
+     */
+    private int sumOfRightSideTroops(ArrayList<AliveTroop> troops) {
+        AtomicInteger sum = new AtomicInteger();
+        troops.forEach(troop -> {
+            if (troop.getLocation().getX() > 172) {
+                sum.addAndGet(troop.getCard().getCost());
+            }
+        });
+        return sum.get();
+    }
+
+    /**
+     * this method add troop to waiting list
+     * @param point is the point of the initial location of the troop
+     * @param card is the card which is assigned to the troop
+     */
+    private void addCardToWaitingList(Point2D point, Card card) {
+        getStatus().getCardsDeskInUse().remove(card);
+        getStatus().getCardsDeskInUse().add(0, card);
+        getStatus().decreaseElixirs(card.getCost());
+        for (int i = 0; i < (card instanceof Troop ? ((Troop) card).getCount() : 1); i++) {
+            if (i % 2 == 0)
+                getStatus().getTroopsInWaitingList().add(new AliveTroop(card,
+                        getStatus().getEnemyRelativePoint(new Point2D(point.getX() + 20 * i, point.getY()))));
+            if (i % 2 != 0)
+                getStatus().getTroopsInWaitingList().add(new AliveTroop(card,
+                        getStatus().getEnemyRelativePoint(new Point2D(point.getX(), point.getY() + 20 * i))));
+        }
     }
 
     /**
