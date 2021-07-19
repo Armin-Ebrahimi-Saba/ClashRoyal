@@ -113,6 +113,14 @@ public abstract class Card implements Serializable {
     }
 
     /**
+     * this method return tone of a troop
+     * @return String address of tone
+     */
+    public String getTone() {
+        return soundAddress;
+    }
+
+    /**
      * this method is a getter
      * @return true if it is area splash else false
      */

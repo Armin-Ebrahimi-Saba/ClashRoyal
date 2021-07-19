@@ -30,7 +30,7 @@ public class GameModel {
     // indicate number of allys' crown
     // player2 is the opponent of player1
     private static final float MINIMUM_DISTANCE = 75.0f;
-    public static final Point2D MIDDLE_SECOND_LAYER = new Point2D(213.5,300);
+    public static final Point2D MIDDLE_SECOND_LAYER = new Point2D(213.5,310);
     private Point2D LEFT_BRIDGE_HEAD;
     private Point2D LEFT_BRIDGE_TAIL;
     private Point2D RIGHT_BRIDGE_HEAD;
@@ -66,10 +66,10 @@ public class GameModel {
      * @param player2 is player2
      */
     public void initialize(Status status1 , Player player2) {
-        LEFT_BRIDGE_HEAD = new Point2D(37, 270);
-        LEFT_BRIDGE_TAIL = new Point2D(37, 325);
-        RIGHT_BRIDGE_HEAD = new Point2D(335, 270);
-        RIGHT_BRIDGE_TAIL = new Point2D(335, 325);
+        LEFT_BRIDGE_HEAD = new Point2D(68, 305);
+        LEFT_BRIDGE_TAIL = new Point2D(68, 357);
+        RIGHT_BRIDGE_HEAD = new Point2D(360, 305);
+        RIGHT_BRIDGE_TAIL = new Point2D(360, 357);
         this.player2 = player2;
         this.statusPlayer1 = status1;
         this.statusPlayer2 = player2.getStatus();
@@ -220,11 +220,11 @@ public class GameModel {
         if (!(troop.getCard() instanceof Spell)) {
             if (!(troop.getCard()).getName().equals(TroopName.GIANT)) {
                 for (var enemyTroop : aliveEnemyTroops) {
-                    int size = 40;
+                    int size = 60;
                     if (enemyTroop.getCard() instanceof Building && (
                         enemyTroop.getCard().getName().equals(BuildingName.KING_TOWER) ||
                         enemyTroop.getCard().getName().equals(BuildingName.ARCHER_TOWER)))
-                        size = 60;
+                        size = 80;
                     if (isIntersected(troop.getLocation(), size, size, enemyTroop.getLocation(), troop.getCard().getRange()) &&
                             !(enemyTroop.getCard() instanceof Spell))
                     {

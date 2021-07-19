@@ -7,14 +7,20 @@ import javafx.geometry.Point2D;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Base64;
 
 public class Client extends Player implements Runnable {
+    // status of the client
+    // reader which reads line of string from buffer
+    // out is the outputStream who send byte streams to server
+    // last respond which was received from the server
+    // indicates weather player is connected to the game or not
     private Status status;
     private BufferedReader reader;
     private OutputStream out;
     private String lastRespond;
-    private boolean isSecondPlayer =true;
+    private boolean isConnected = false;
 
     /** this is the main method the class which is used for running a client server. */
     @Override
@@ -69,19 +75,28 @@ public class Client extends Player implements Runnable {
                             Double.parseDouble(partitions[1]),
                             Double.parseDouble(partitions[2]));
                     Card card = (Card)fromString(partitions[3]);
-                    for (int i = 0; i < (card instanceof Troop ? ((Troop) card).getCount() : 1); i++) {
-                        if (i % 2 == 0)
-                            status.getEnemyStatus().getAliveAllyTroops().
-                                    add(new AliveTroop(card,
-                                    new Point2D(point.getX() + 20 * i, point.getY())));
-                        if (i % 2 != 0)
-                            status.getEnemyStatus().getAliveAllyTroops().
-                                    add(new AliveTroop(card,
-                                    new Point2D(point.getX(), point.getY() + 20 * i)));
-                    }
+                    if (lastRespond.contains("PLAY_ALLY"))
+                        addTroopToAList(status.getAliveAllyTroops(),
+                                        card, point);
+                    else
+                        addTroopToAList(status.getEnemyStatus().getAliveAllyTroops(),
+                                        card, point);
                 }
             }
         } catch(IOException | ClassNotFoundException ex) {ex.printStackTrace();}
+    }
+
+    private void addTroopToAList(ArrayList<AliveTroop> aliveTroops, Card card, Point2D point) {
+        for (int i = 0; i < (card instanceof Troop ? ((Troop) card).getCount() : 1); i++) {
+            if (i % 2 == 0)
+                aliveTroops.
+                        add(new AliveTroop(card,
+                        new Point2D(point.getX() + 20 * i, point.getY())));
+            if (i % 2 != 0)
+                aliveTroops.
+                        add(new AliveTroop(card,
+                        new Point2D(point.getX(), point.getY() + 20 * i)));
+        }
     }
 
     /**
@@ -104,20 +119,6 @@ public class Client extends Player implements Runnable {
         return lastRespond;
     }
 
-    /** this change player from being second to first or visa versa. */
-    public void changeTurn () {
-        isSecondPlayer = !isSecondPlayer;
-    }
-
-    /** Write the object to a Base64 string. */
-    private static String toString( Serializable o ) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream( baos );
-        oos.writeObject( o );
-        oos.close();
-        return Base64.getEncoder().encodeToString(baos.toByteArray());
-    }
-
     /** Read the object from a Base64 string. */
     private static Object fromString( String s ) throws IOException ,
             ClassNotFoundException {
@@ -127,5 +128,26 @@ public class Client extends Player implements Runnable {
         Object o  = ois.readObject();
         ois.close();
         return o;
+    }
+
+    /**
+     * this method disconnect the player from the game
+     */
+    public void disconnect() {
+        isConnected = false;
+    }
+
+    /**
+     * this method connect the player to the game
+     */
+    public void connect() {
+        isConnected = true;
+    }
+
+    /**
+     * this method returns true if the client is connected to the game else flase
+     */
+    public boolean isConnected() {
+        return isConnected;
     }
 }

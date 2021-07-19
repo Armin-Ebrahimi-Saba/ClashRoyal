@@ -12,33 +12,47 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TextArea?>
 <AnchorPane prefHeight="554.0" prefWidth="558.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainMenu.MenuController">
    <children>
-      <TabPane fx:id="mainMenuTabPane" layoutY="-2.0" prefHeight="556.0" prefWidth="603.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
+      <TabPane  fx:id="mainMenuTabPane" styleClass="buttonBar" stylesheets="/mainMenu/style.css" layoutY="-2.0" prefHeight="556.0" prefWidth="603.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab fx:id="battleTab" text="Battle">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="142.0" prefWidth="389.0" styleClass="AnchorPane" stylesheets="/mainMenu/style.css">
                      <children>
-                        <Button layoutX="302.0" layoutY="367.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="102.0" style="-fx-font-size: 25; -fx-font: Bold;" text="2 V 2">
+                        <Button fx:id="twoOnTwoButton" layoutX="302.0" layoutY="367.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="102.0" style="-fx-font-size: 25; -fx-font: Bold;" text="2 V 2">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Button>
                         <Button fx:id="battleButton" layoutX="188.0" layoutY="366.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="107.0" style="-fx-font-size: 25;" text="Battle" />
                         <ProgressBar fx:id="xpBar" layoutX="69.0" layoutY="21.0" prefHeight="20.0" prefWidth="123.0" progress="0.0" />
-                        <ImageView fitHeight="44.0" fitWidth="55.0" layoutX="14.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true" />
-                        <HBox layoutX="22.0" layoutY="58.0" prefHeight="61.0" prefWidth="382.0">
+                        <ImageView fitHeight="60.0" fitWidth="45.0" layoutX="14.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="/mainMenu/menuAssets/ribbon.png"/>
+                            </image>
+                        </ImageView>
+                        <HBox layoutX="22.0" layoutY="58.0" prefHeight="61.0" prefWidth="382.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css">
                            <children>
-                              <ImageView fitHeight="61.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fitHeight="61.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true">
+                                  <image>
+                                      <Image url="/mainMenu/menuAssets/avatar.png"/>
+                                  </image>
+                              </ImageView>
                               <Label fx:id="usernameLabel" layoutX="64.0" layoutY="10.0" prefHeight="62.0" prefWidth="217.0" text="username">
                                  <font>
                                     <Font name="System Bold Italic" size="16.0" />
                                  </font>
                               </Label>
-                              <HBox prefHeight="61.0" prefWidth="34.0">
+                              <HBox prefHeight="61.0" prefWidth="34.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css">
                                  <children>
-                                    <ImageView fitHeight="61.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true" />
+                                    <ImageView fitHeight="61.0" fitWidth="66.0" pickOnBounds="true" preserveRatio="true" >
+                                        <image>
+                                            <Image url="/mainMenu/menuAssets/trophy.png"/>
+                                        </image>
+                                    </ImageView>
                                  </children>
                               </HBox>
                               <Label fx:id="trophyLabel" prefHeight="61.0" prefWidth="75.0" style="-fx-font-size: 16; -fx-font-family: impact;" text="trophy">
@@ -48,12 +62,12 @@
                               </Label>
                            </children>
                         </HBox>
-                        <Button layoutX="532.0" layoutY="2.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="73.0" style="-fx-font-size: 20;" text="Exit" />
+                        <Button fx:id="logoutButton" layoutX="450.0" layoutY="2.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="173.0" style="-fx-font-size: 20;" text="LOGOUT" />
                         <ImageView fitHeight="232.0" fitWidth="258.0" layoutX="173.0" layoutY="126.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="/mainMenu/menuAssets/Spooky_Town.png" />
                            </image></ImageView>
-                        <Label fx:id="levelLabel" layoutX="32.0" layoutY="19.0" style="-fx-font-family: comic; -fx-font-weight: bold; -fx-font-size: 16;" text="12" />
+                        <Label fx:id="levelLabel" layoutX="32.0" layoutY="19.0" style="-fx-font-family: comic; -fx-font-weight: bold; -fx-font-size: 20;" text="12" />
                      </children>
                   </AnchorPane>
             </content>
@@ -124,6 +138,14 @@
                      </children>
                   </AnchorPane>
                </content>
+            </Tab>
+            <Tab fx:id="previousGamesTab" text="history">
+                <content>
+                    <AnchorPane prefHeight="226.0" prefWidth="550" styleClass="AnchorPane" stylesheets="/mainMenu/style.css">
+                        <TextArea fx:id="historyTextArea" prefWidth="550.0" prefHeight="226.0">
+                        </TextArea>
+                    </AnchorPane>
+                </content>
             </Tab>
         </tabs>
       </TabPane>

@@ -2,8 +2,10 @@
     -fx-background-image:url('/mainMenu/menuAssets/Tile_Background.jpg')
 }
 .buttonBar{
-    -fx-background-image: url('/mainMenu/menuAssets/Wood_Background.jpg');
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-background-image: url('/mainMenu/menuAssets/Wood_Background3.jpg');
 }
 .gameBackground{
-    -fx-background-image: url('/mainMenu/menuAssets/new.jpg');
+    -fx-background-image: url('/mainMenu/menuAssets/background.jpg');
 }

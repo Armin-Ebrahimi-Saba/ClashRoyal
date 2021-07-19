@@ -11,6 +11,7 @@ import dbUtil.DBConnection;
 import player.Status;
 
 public class LoginModel {
+    // connection between model and database
     private Connection connection;
 
     /**

@@ -15,14 +15,13 @@ public class Status implements Serializable {
     transient private ArrayList<AliveTroop> aliveAllyTroops;
     transient private ArrayList<AliveTroop> aliveEnemyTroops;
     transient private ArrayList<AliveTroop> troopsInWaitingList;
-    transient private String enemyUsername;
     transient private Status enemyStatus;
     private final String username;
     private int trophy;
     private int level;
     private int XP;
-    private int elixirs;
-    private ArrayList<String> history;
+    transient private int elixirs;
+    private final ArrayList<String> history;
 
     /**
      * this is a constructor
@@ -51,15 +50,30 @@ public class Status implements Serializable {
     }
 
     /**
-     * this method reset towers in the list
+     * this method prepares the status for a 2 on 2 game
      */
-    public void resetLists() {
+    public void resetListsFor2On2() {
+        this.elixirs = 5;
         aliveAllyTroops = new ArrayList<>();
         aliveEnemyTroops = new ArrayList<>();
         troopsInWaitingList = new ArrayList<>();
-        aliveAllyTroops.add(new AliveTroop(CardsCollection.getArcherTowers().get(level - 1), new Point2D(33.0, 473)));
-        aliveAllyTroops.add(new AliveTroop(CardsCollection.getArcherTowers().get(level - 1), new Point2D(324.0, 473)));
-        aliveAllyTroops.add(new AliveTroop(CardsCollection.getKingTowers().get(level - 1), new Point2D(174.0, 567)));
+        aliveAllyTroops.add(new AliveTroop(CardsCollection.getArcherTowers().get(level - 1), new Point2D(33.0, 550)));
+        aliveAllyTroops.add(new AliveTroop(CardsCollection.getArcherTowers().get(level - 1), new Point2D(324.0, 550)));
+        aliveAllyTroops.add(new AliveTroop(CardsCollection.getKingTowers().get(level - 1), new Point2D(125.0, 600)));
+        aliveAllyTroops.add(new AliveTroop(CardsCollection.getKingTowers().get(level - 1), new Point2D(235.0, 600)));
+    }
+
+    /**
+     * this method reset towers in the list
+     */
+    public void resetLists() {
+        this.elixirs = 5;
+        aliveAllyTroops = new ArrayList<>();
+        aliveEnemyTroops = new ArrayList<>();
+        troopsInWaitingList = new ArrayList<>();
+        aliveAllyTroops.add(new AliveTroop(CardsCollection.getArcherTowers().get(level - 1), new Point2D(33.0, 550)));
+        aliveAllyTroops.add(new AliveTroop(CardsCollection.getArcherTowers().get(level - 1), new Point2D(324.0, 550)));
+        aliveAllyTroops.add(new AliveTroop(CardsCollection.getKingTowers().get(level - 1), new Point2D(174.0, 600)));
     }
 
     /**
@@ -102,14 +116,6 @@ public class Status implements Serializable {
             return (XP - 3400)/2500.0;
         else
             return 1;
-    }
-
-    /**
-     * this method increase level of this client
-     */
-    public void increaseLevel() {
-        XP = 0;
-        level += 1;
     }
 
     /**
@@ -189,7 +195,6 @@ public class Status implements Serializable {
                 aliveEnemyTroops.add(troop);
             }
         });
-        enemyUsername = enemyStatus.getUsername();
     }
 
     /**
@@ -197,8 +202,11 @@ public class Status implements Serializable {
      * @param enemyStatus is the status of the enemy
      */
     public void setEnemyStatus(Status enemyStatus) {
+        if (enemyStatus == null) {
+            this.enemyStatus = null;
+            return;
+        }
         this.aliveEnemyTroops = enemyStatus.getAliveAllyTroops();
-        this.enemyUsername = enemyStatus.getUsername();
     }
 
     /**
@@ -215,14 +223,6 @@ public class Status implements Serializable {
      */
     public Status getEnemyStatus() {
         return enemyStatus;
-    }
-
-    /**
-     * this is a getter
-     * @return username of the enemy
-     */
-    public String getEnemyUsername() {
-        return enemyUsername;
     }
 
     /**
@@ -255,6 +255,14 @@ public class Status implements Serializable {
      */
     public ArrayList<AliveTroop> getTroopsInWaitingList() {
         return troopsInWaitingList;
+    }
+
+    /**
+     * this is a getter
+     * @return list of all games with their results
+     */
+    public ArrayList<String> getHistory() {
+        return history;
     }
 }
 

@@ -21,6 +21,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.AudioClip;
 import javafx.stage.Stage;
 import mainMenu.MenuController;
 import player.Bot;
@@ -42,27 +43,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GameController implements EventHandler<MouseEvent> {
     private TimerTask timerTask;
     private GameModel gameModel;
-    private Client client1;
     private Player player2;
+    private Client client1;
+    private Client client2 = null;
+    private Client client3 = null;
+    private Client client4 = null;
     private ArrayList<Button> listedButtons;
     private Timer timer;
     private final int FRAMES_PER_SECOND = 10;
     public static long frameTimeInMilliseconds;
     private GameView gameView;
-    private boolean isGameFinished = false;
-    @FXML private ButtonBar buttonBar;
     @FXML private Button card4Button;
     @FXML private Button card3Button;
     @FXML private Button card2Button;
     @FXML private Button card1Button;
     @FXML private AnchorPane firstLayer;
     @FXML private AnchorPane secondLayerPane;
-    @FXML private Button tower1;
-    @FXML private Button tower2;
-    @FXML private Button tower3;
-    @FXML private Button tower4;
-    @FXML private Button king1;
-    @FXML private Button king2;
     @FXML private Label timerLabel;
     @FXML private Label blueCrownNumber;
     @FXML private Label redCrownNumber;
@@ -86,6 +82,8 @@ public class GameController implements EventHandler<MouseEvent> {
 
     /**
      * this method initialize game
+     * @param player1 is the player which is in direct contact with the game
+     * @param player2 is the second player which might be a bot or a real player
      */
     public void initialize(Client player1, Player player2) {
         player1.getStatus().resetLists();
@@ -121,8 +119,8 @@ public class GameController implements EventHandler<MouseEvent> {
                 int finalTime = time;
                 Platform.runLater(() -> timerLabel.setText(finalTime /60 + ":" + String.format("%02d", finalTime %60)));
                 if (time < 60) {
-                    Platform.runLater(() -> timerLabel.setStyle("-fx-text-fill: Red"));
-                    Platform.runLater(() -> timerLabel.setStyle("-fx-font-weight: Bold"));
+                    Platform.runLater(() -> timerLabel.setStyle("-fx-text-fill: #ff0000"));
+                    Platform.runLater(() -> timerLabel.setStyle("-fx-font-weight: bold"));
                     Platform.runLater(() -> timerLabel.setStyle("-fx-font-size: 22"));
                 }
             }
@@ -142,30 +140,21 @@ public class GameController implements EventHandler<MouseEvent> {
             }
         });
         Thread kingWatcher = new Thread(() -> {
-            while (true) {
+            while (client1.isConnected()) {
                 try {Thread.sleep(500);
                 } catch (InterruptedException e) {e.printStackTrace();}
-                AtomicBoolean isKingAlive = new AtomicBoolean(false);
-                client1.getStatus().getAliveAllyTroops().forEach(troop -> {
-                    if (troop.getCard().getName().equals(BuildingName.KING_TOWER))
-                        isKingAlive.set(true);
-                });
-                if (!isKingAlive.get()) {
+                if (!isKingAlive(client1)) {
                     Platform.runLater(this::indicateTheWinner);
-                    return;
+                    break;
                 }
-                player2.getStatus().getAliveAllyTroops().forEach(troop -> {
-                    if (troop.getCard().getName().equals(BuildingName.KING_TOWER))
-                        isKingAlive.set(true);
-                });
-                if (!isKingAlive.get()) {
+                if (!isKingAlive(player2)) {
                     Platform.runLater(this::indicateTheWinner);
-                    return;
+                    break;
                 }
             }
         });
         Thread crownCounter = new Thread(() -> {
-            while (true) {
+            while (client1.isConnected()) {
                 Platform.runLater(() -> {
                     blueCrownNumber.setText(String.valueOf(gameModel.getAllyCrown()));
                     redCrownNumber.setText(String.valueOf(gameModel.getEnemyCrown()));
@@ -231,27 +220,173 @@ public class GameController implements EventHandler<MouseEvent> {
     }
 
     /**
+     * this method initialize game
+     * @param player1 is the player which is in direct contact with the game
+     * @param clients is the list of all players teammate and components
+     */
+    public void initialize(Client player1, Client...clients) {
+        client1.getStatus().resetListsFor2On2();
+        client2.getStatus().resetListsFor2On2();
+        client3.getStatus().resetListsFor2On2();
+        client4.getStatus().resetListsFor2On2();
+        client1 = player1;
+        this.client2 = clients[0];
+        this.client3 = clients[1];
+        this.client4 = clients[2];
+        var status1 = player1.getStatus();
+        var status2 = player2.getStatus();
+        var status3 = client3.getStatus();
+        var status4 = client4.getStatus();
+        Thread timerThread = new Thread(() -> {
+            int time = 180;
+            int counter1 = 0;
+            int counter2 = 0;
+            while (time > 0) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (counter1 == (time > 60 ? 2 : 1)) {
+                    status1.increaseElixirs();
+                    Platform.runLater(() -> elixirCount.setText(String.valueOf(status1.getElixirs())));
+                    counter1 = 0;
+                }
+                if (counter2 == (time > 60 ? 2 : 1)) {
+                    status2.increaseElixirs();
+                    counter2 = 0;
+                }
+                if (status1.getElixirs() < 10)
+                    counter1++;
+                if (status2.getElixirs() < 10)
+                    counter2++;
+                time--;
+                int finalTime = time;
+                Platform.runLater(() -> timerLabel.setText(finalTime /60 + ":" + String.format("%02d", finalTime %60)));
+                if (time < 60) {
+                    Platform.runLater(() -> timerLabel.setStyle("-fx-text-fill: #ff0000"));
+                    Platform.runLater(() -> timerLabel.setStyle("-fx-font-weight: bold"));
+                    Platform.runLater(() -> timerLabel.setStyle("-fx-font-size: 22"));
+                }
+            }
+            Platform.runLater(this::indicateTheWinner);
+        });
+        Thread elixirThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Platform.runLater(() -> {
+                        elixirImage.setAccessibleText(String.valueOf(status1.getElixirs()));
+                        elixirBar.setProgress(status1.getElixirs()/10.0);
+                    });
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        Thread kingWatcher = new Thread(() -> {
+            while (client1.isConnected()) {
+                try {Thread.sleep(500);
+                } catch (InterruptedException e) {e.printStackTrace();}
+                AtomicBoolean isKingAlive = new AtomicBoolean(false);
+                client1.getStatus().getAliveAllyTroops().forEach(troop -> {
+                    if (troop.getCard().getName().equals(BuildingName.KING_TOWER))
+                        isKingAlive.set(true);
+                });
+                if (!isKingAlive.get()) {
+                    Platform.runLater(this::indicateTheWinner);
+                    break;
+                }
+                player2.getStatus().getAliveAllyTroops().forEach(troop -> {
+                    if (troop.getCard().getName().equals(BuildingName.KING_TOWER))
+                        isKingAlive.set(true);
+                });
+                if (!isKingAlive.get()) {
+                    Platform.runLater(this::indicateTheWinner);
+                    break;
+                }
+            }
+        });
+        Thread crownCounter = new Thread(() -> {
+            while (client1.isConnected()) {
+                Platform.runLater(() -> {
+                    blueCrownNumber.setText(String.valueOf(gameModel.getAllyCrown()));
+                    redCrownNumber.setText(String.valueOf(gameModel.getEnemyCrown()));
+                });
+                try {
+                    Thread.sleep(400);
+                } catch (InterruptedException e) {e.printStackTrace();}
+            }
+        });
+        crownCounter.start();
+        kingWatcher.start();
+        timerThread.start();
+        elixirThread.start();
+        nextCardImage.setFitHeight(60);
+        nextCardImage.setFitWidth(45);
+        componentUsernameLabel.setText(status4.getUsername() + " & " + status3.getUsername());
+        secondLayerPane = new AnchorPane();
+        secondLayerPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.0)");
+        gameModel = new GameModel();
+        gameModel.initialize(status1, player2);
+        gameView = new GameView();
+        gameView.initialize(gameModel);
+        secondLayerPane.getChildren().add(gameView);
+        listedButtons = new ArrayList<>();
+        listedButtons.add(card1Button);
+        listedButtons.add(card2Button);
+        listedButtons.add(card3Button);
+        listedButtons.add(card4Button);
+        for (int i = 0; i < 4; i++)
+            setButtonImage(listedButtons.get(i), gameModel.getPlayersStatus()[0].getCardsDeskInUse().get(4 + i).getCardAddress());
+        firstLayer.getChildren().add(gameView);
+        startTimer();
+
+        EventHandler<ActionEvent> cardButtonAction = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Platform.runLater(() -> {
+                    gameModel.setStack((Button) actionEvent.getTarget(),
+                            gameModel.getPlayersStatus()[0].getCardsDeskInUse().get(4 + listedButtons.indexOf((Button) actionEvent.getTarget())));
+                    if (!firstLayer.getChildren().contains(ShapeHolder.getTopRectangle()))
+                        firstLayer.getChildren().add(ShapeHolder.getTopRectangle());
+                    status2.getAliveAllyTroops().forEach(troop -> {
+                        if (troop.getCard().getName().equals(BuildingName.ARCHER_TOWER)) {
+                            if (!firstLayer.getChildren().contains(ShapeHolder.getRightRectangle()) &&
+                                    troop.getLocation().getX() > 172)
+                                firstLayer.getChildren().add(ShapeHolder.getRightRectangle());
+                            else if (!firstLayer.getChildren().contains(ShapeHolder.getLeftRectangle()) &&
+                                    troop.getLocation().getX() < 172)
+                                firstLayer.getChildren().add(ShapeHolder.getLeftRectangle());
+                        }
+                    });
+                });
+            }
+        };
+        listedButtons.forEach(button -> button.setOnAction(cardButtonAction));
+    }
+
+    /**
      * this method indicates the winner
      */
     private void indicateTheWinner() {
+        client1.disconnect();
         timerTask.cancel();
         timer.cancel();
+        timer.purge();
         if (player2 instanceof Bot) {
             ((Bot)player2).disconnectFromGame();
         }
-        isGameFinished = true;
         int bluePoint = Integer.parseInt(blueCrownNumber.getText());
         int redPoint = Integer.parseInt(redCrownNumber.getText());
         if (!isKingAlive(client1)) {
-            client1.getStatus().addRecord(client1.getStatus().getUsername() + "(" + bluePoint + ")" + "   WON   " + "(" + 3 + ")" + player2.getStatus().getUsername());
+            client1.getStatus().addRecord(client1.getStatus().getUsername() + "(" + bluePoint + ")" + "   LOST " + "(" + 3 + ")" + player2.getStatus().getUsername());
             client1.getStatus().increaseXP(200);
             client1.getStatus().increaseTrophy(20);
-        }
-        if (!isKingAlive(player2)) {
-            client1.getStatus().addRecord(client1.getStatus().getUsername() + "(" + 3 + ")" + "   LOST   " + "(" + redPoint + ")" + player2.getStatus().getUsername());
+        } else if (!isKingAlive(player2)) {
+            client1.getStatus().addRecord(client1.getStatus().getUsername() + "(" + 3 + ")" + "   WON " + "(" + redPoint + ")" + player2.getStatus().getUsername());
             client1.getStatus().increaseXP(70);
-        }
-        if (bluePoint > redPoint) {
+        } else if (bluePoint > redPoint) {
             client1.getStatus().addRecord(client1.getStatus().getUsername() + "("  + bluePoint + ")" + "   WON   " + "(" + redPoint + ")" + player2.getStatus().getUsername());
             client1.getStatus().increaseXP(200);
             client1.getStatus().increaseTrophy(20);
@@ -272,16 +407,15 @@ public class GameController implements EventHandler<MouseEvent> {
         }
         try {
             client1.sendCommand("<SAVE> " + toString(client1.getStatus()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) {e.printStackTrace();}
+        client1.getStatus().setEnemyStatus(null);
         goToMainMenu();
     }
 
     /** this method switch from game to main menu. */
     private void goToMainMenu() {
         try {
-            Stage playerStage = new Stage();
+            Stage playerStage = (Stage) blueCrownNumber.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader();
             Pane root = (Pane) loader.load(getClass().getResource("/mainMenu/menu.fxml").openStream());
             MenuController menuController = loader.getController();
@@ -374,13 +508,34 @@ public class GameController implements EventHandler<MouseEvent> {
                     setButtonImage(listedButtons.get(i), cardDeskInUse.get(4 + i).getCardAddress());
                 nextCardImage.setImage(new Image(cardDeskInUse.get(3).getCardAddress()));
                 client1.getStatus().decreaseElixirs(gameModel.getStackedCard().getCost());
-                if (player2 instanceof Client) {
+                if (player2 instanceof Client && client3 == null && client4 == null) {
                     try {
-                        client1.sendCommand("<PLAY> " + mouseLocation.getX() + " "
-                                                      + mouseLocation.getY() + " "
-                                                      + toString(gameModel.getStackedCard()));
-                        System.out.println("sent");
+                        client1.sendCommand("<PLAY> "
+                                + mouseLocation.getX() + " "
+                                + mouseLocation.getY() + " "
+                                + toString(gameModel.getStackedCard()));
+                        //AudioClip clip = new AudioClip(gameModel.getStackedCard().getTone());
+                        //clip.play();
                     } catch (IOException e) {e.printStackTrace();}
+                } else if ( client2 != null &&
+                            client3 != null &&
+                            client4 != null) {
+                    try {
+                        client1.sendCommand("<PLAY_ALLY> "
+                                + mouseLocation.getX() + " "
+                                + mouseLocation.getY() + " "
+                                + toString(gameModel.getStackedCard()));
+
+                        client2.sendCommand("<PLAY_ENEMY> "
+                                + mouseLocation.getX() + " "
+                                + mouseLocation.getY() + " "
+                                + toString(gameModel.getStackedCard()));
+
+                        client3.sendCommand("<PLAY_ENEMY> "
+                                + mouseLocation.getX() + " "
+                                + mouseLocation.getY() + " "
+                                + toString(gameModel.getStackedCard()));
+                    } catch (IOException ex) {ex.printStackTrace();}
                 }
                 gameModel.resetStack();
             }
@@ -403,7 +558,8 @@ public class GameController implements EventHandler<MouseEvent> {
         this.timer = new Timer();
         timerTask = new TimerTask() {
             public void run() {
-                Platform.runLater(() -> update());
+                if (client1.isConnected())
+                    Platform.runLater(() -> update());
             }
         };
         frameTimeInMilliseconds = (long)(1000.0 / FRAMES_PER_SECOND);
@@ -416,13 +572,5 @@ public class GameController implements EventHandler<MouseEvent> {
     private void update() {
         gameModel.step();
         gameView.update(gameModel);
-    }
-
-    /**
-     * this is a getter
-     * @return true if game is finished otherwise false
-     */
-    public boolean isGameFinished() {
-        return isGameFinished;
     }
 }

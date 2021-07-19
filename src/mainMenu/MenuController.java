@@ -1,7 +1,6 @@
 package mainMenu;
 
 import game.GameController;
-import gameUtil.BuildingName;
 import gameUtil.Card;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -14,13 +13,17 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
+import login.LoginController;
 import player.Bot;
 import player.Client;
-import player.Player;
 import player.Status;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -28,12 +31,12 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static java.lang.Thread.sleep;
-
 public class MenuController {
     private MenuModel menuModel;
     private HashMap<Button, Card> linkedButtons;
 
+    @FXML private TextArea historyTextArea;
+    @FXML private Button twoOnTwoButton;
     @FXML private ProgressBar xpBar;
     @FXML private Button battleButton;
     @FXML private Button normalBotButton;
@@ -51,9 +54,11 @@ public class MenuController {
     @FXML private Button button10;
     @FXML private Button button11;
     @FXML private Button button12;
+    @FXML private Button logoutButton;
     @FXML private Label usernameLabel;
     @FXML private Label trophyLabel;
     @FXML private Label levelLabel;
+
 
     /**
      * this is a constructor
@@ -74,6 +79,15 @@ public class MenuController {
      * @throws IOException is the exception
      */
     public void initialize(Client client) throws IOException {
+        //Media media = new Media(new File("login.wav").toURI().toString());
+        //MediaPlayer player = new MediaPlayer(media);
+        //player.play();
+        String history = "";
+        for (String string : client.getStatus().getHistory())
+            history += string + "\n";
+        historyTextArea.setText(history + "\n");
+        historyTextArea.setStyle("-fx-font-size: 1em;");
+        historyTextArea.setDisable(true);
         Status clientStatus = client.getStatus();
         ArrayList<Button> buttonsList = new ArrayList<>();
         Collections.addAll(buttonsList, button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11, button12);
@@ -96,16 +110,35 @@ public class MenuController {
             setButtonImage(linkedButtons.get(button).getCardAddress(), button);
         }
 
+        EventHandler<ActionEvent> logoutButtonAction = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    Stage stage = (Stage) button1.getScene().getWindow();
+                    FXMLLoader loader = new FXMLLoader();
+                    Pane root = (Pane) loader.load(getClass().getResource("/login/login.fxml").openStream());
+                    LoginController loginController = loader.getController();
+                    Scene scene = new Scene(root);
+                    stage.setScene(scene);
+                    stage.setTitle("Clash Royal");
+                    stage.setResizable(false);
+                    stage.show();
+                } catch (IOException ex) {ex.printStackTrace();}
+            }
+        };
+        logoutButton.setOnAction(logoutButtonAction);
+
         EventHandler<ActionEvent> botButtonOnClick = new EventHandler<>() {
             public void handle(ActionEvent e) {
                 try {
+                    client.connect();
                     menuModel.getStatus().getCardsDeskInUse().clear();
                     linkedButtons.remove(button9);
                     linkedButtons.remove(button10);
                     linkedButtons.remove(button11);
                     linkedButtons.remove(button12);
                     menuModel.getStatus().getCardsDeskInUse().addAll(linkedButtons.values());
-                    Stage playerStage = new Stage();
+                    Stage playerStage = (Stage) button1.getScene().getWindow();
                     FXMLLoader loader = new FXMLLoader();
                     Pane root = loader.load(getClass().getResource("/game/game.fxml").openStream());
                     GameController gameController = loader.getController();
@@ -126,6 +159,7 @@ public class MenuController {
         };
         normalBotButton.setOnAction(botButtonOnClick);
         smartBotButton.setOnAction(botButtonOnClick);
+
         EventHandler<ActionEvent> battleButtonEvent = new EventHandler<>() {
             String s;
             public void handle(ActionEvent e) {
@@ -140,13 +174,14 @@ public class MenuController {
                     thread.start();
                     client.sendCommand("FIND_COMPONENT_1");
                     thread.join();
+                    client.connect();
                     menuModel.getStatus().getCardsDeskInUse().clear();
                     linkedButtons.remove(button9);
                     linkedButtons.remove(button10);
                     linkedButtons.remove(button11);
                     linkedButtons.remove(button12);
                     menuModel.getStatus().getCardsDeskInUse().addAll(linkedButtons.values());
-                    Stage playerStage = new Stage();
+                    Stage playerStage = (Stage) button1.getScene().getWindow();
                     FXMLLoader loader = new FXMLLoader();
                     Pane root = loader.load(getClass().getResource("/game/game.fxml").openStream());
                     GameController gameController = loader.getController();
@@ -164,6 +199,59 @@ public class MenuController {
             }
         };
         battleButton.setOnAction(battleButtonEvent);
+
+        EventHandler<ActionEvent> twoOnTwoButtonEvent = new EventHandler<>() {
+            String s;
+            public void handle(ActionEvent e) {
+                try {
+                    String[] stateStrings = new String[3];
+                    Thread thread = new Thread(() -> {
+                        int i = 0;
+                        while (i < 3) {
+                            while (!(s = client.getLastRespond()).contains("<READY>")) {
+                                try { Thread.sleep(150);
+                                } catch (InterruptedException interruptedException) {interruptedException.printStackTrace();}
+                            }
+                            stateStrings[i] = s;
+                            i++;
+                        }
+                    });
+                    thread.start();
+                    client.sendCommand("FIND_COMPONENT_2");
+                    thread.join();
+                    client.connect();
+                    menuModel.getStatus().getCardsDeskInUse().clear();
+                    linkedButtons.remove(button9);
+                    linkedButtons.remove(button10);
+                    linkedButtons.remove(button11);
+                    linkedButtons.remove(button12);
+                    menuModel.getStatus().getCardsDeskInUse().addAll(linkedButtons.values());
+                    Stage playerStage = (Stage) button1.getScene().getWindow();
+                    FXMLLoader loader = new FXMLLoader();
+                    Pane root = loader.load(getClass().getResource("/game/game.fxml").openStream());
+                    GameController gameController = loader.getController();
+                    Status[] statusList = new Status[3];
+                    for (int i = 0; i < 3; i++) {
+                        statusList[i] = (Status)fromString(stateStrings[i]);
+                    }
+                    Client teamMate = new Client();
+                    teamMate.setStatus(statusList[0]);
+                    Client component1 = new Client();
+                    component1.setStatus(statusList[1]);
+                    Client component2 = new Client();
+                    component2.setStatus(statusList[2]);
+
+                    gameController.initialize(client, teamMate, component1, component2);
+                    Scene scene = new Scene(root);
+                    playerStage.setScene(scene);
+                    playerStage.setTitle("Clash Royal");
+                    root.setOnMouseClicked(gameController);
+                    playerStage.setResizable(false);
+                    playerStage.show();
+                } catch (IOException | InterruptedException | ClassNotFoundException ioException) {ioException.printStackTrace();}
+            }
+        };
+        twoOnTwoButton.setOnAction(twoOnTwoButtonEvent);
 
         mainMenuTabPane.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
