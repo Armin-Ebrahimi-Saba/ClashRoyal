@@ -86,7 +86,7 @@ public class MenuController {
         for (String string : client.getStatus().getHistory())
             history += string + "\n";
         historyTextArea.setText(history + "\n");
-        historyTextArea.setStyle("-fx-font-size: 1em;");
+        historyTextArea.setStyle("-fx-font-size: 1.8em;");
         historyTextArea.setDisable(true);
         Status clientStatus = client.getStatus();
         ArrayList<Button> buttonsList = new ArrayList<>();
@@ -208,10 +208,25 @@ public class MenuController {
                     Thread thread = new Thread(() -> {
                         int i = 0;
                         while (i < 3) {
-                            while (!(s = client.getLastRespond()).contains("<READY>")) {
-                                try { Thread.sleep(150);
+                            while (!(s = client.getLastRespond()).contains("<READY1>")) {
+                                try { Thread.sleep(50);
                                 } catch (InterruptedException interruptedException) {interruptedException.printStackTrace();}
                             }
+                            System.out.println(s);
+                            stateStrings[i] = s;
+                            i++;
+                            while (!(s = client.getLastRespond()).contains("<READY2>")) {
+                                try { Thread.sleep(50);
+                                } catch (InterruptedException interruptedException) {interruptedException.printStackTrace();}
+                            }
+                            System.out.println(s);
+                            stateStrings[i] = s;
+                            i++;
+                            while (!(s = client.getLastRespond()).contains("<READY3>")) {
+                                try { Thread.sleep(50);
+                                } catch (InterruptedException interruptedException) {interruptedException.printStackTrace();}
+                            }
+                            System.out.println(s);
                             stateStrings[i] = s;
                             i++;
                         }
@@ -232,7 +247,7 @@ public class MenuController {
                     GameController gameController = loader.getController();
                     Status[] statusList = new Status[3];
                     for (int i = 0; i < 3; i++) {
-                        statusList[i] = (Status)fromString(stateStrings[i]);
+                        statusList[i] = (Status)fromString(stateStrings[i].split(" ")[1]);
                     }
                     Client teamMate = new Client();
                     teamMate.setStatus(statusList[0]);

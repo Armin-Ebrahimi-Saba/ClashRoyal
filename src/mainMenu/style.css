@@ -9,3 +9,15 @@
 .gameBackground{
     -fx-background-image: url('/mainMenu/menuAssets/background.jpg');
 }
+.button_color_pink{
+    -fx-background-color: rgba(253, 86, 200, 0.4);
+}
+.button_color_yellow{
+    -fx-background-color: rgba(240, 243, 0, 0.7);
+}
+.red_color{
+    -fx-background-color: rgba(240, 0, 0, 0.7);
+}
+.no_color{
+    -fx-background-color: rgba(255, 255, 255, 0.0);
+}

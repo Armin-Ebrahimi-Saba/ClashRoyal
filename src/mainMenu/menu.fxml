@@ -22,12 +22,12 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="142.0" prefWidth="389.0" styleClass="AnchorPane" stylesheets="/mainMenu/style.css">
                      <children>
-                        <Button fx:id="twoOnTwoButton" layoutX="302.0" layoutY="367.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="102.0" style="-fx-font-size: 25; -fx-font: Bold;" text="2 V 2">
+                        <Button fx:id="twoOnTwoButton" layoutX="302.0" layoutY="367.0" mnemonicParsing="false" prefHeight="73.0" prefWidth="102.0" style="-fx-font-size: 25; -fx-font: Bold;" text="2 V 2"  stylesheets="style.css" styleClass="button_color_yellow">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Button>
-                        <Button fx:id="battleButton" layoutX="188.0" layoutY="366.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="107.0" style="-fx-font-size: 25;" text="Battle" />
+                        <Button fx:id="battleButton" layoutX="188.0" layoutY="366.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="107.0" style="-fx-font-size: 25;" text="Battle"  stylesheets="style.css" styleClass="button_color_pink"/>
                         <ProgressBar fx:id="xpBar" layoutX="69.0" layoutY="21.0" prefHeight="20.0" prefWidth="123.0" progress="0.0" />
                         <ImageView fitHeight="60.0" fitWidth="45.0" layoutX="14.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true">
                             <image>
@@ -62,7 +62,7 @@
                               </Label>
                            </children>
                         </HBox>
-                        <Button fx:id="logoutButton" layoutX="450.0" layoutY="2.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="173.0" style="-fx-font-size: 20;" text="LOGOUT" />
+                        <Button fx:id="logoutButton" layoutX="450.0" layoutY="2.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="173.0" stylesheets="style.css" styleClass="red_color" style="-fx-font-size: 20;-fx-font-weight: bold" text="LOGOUT" />
                         <ImageView fitHeight="232.0" fitWidth="258.0" layoutX="173.0" layoutY="126.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="/mainMenu/menuAssets/Spooky_Town.png" />
@@ -82,7 +82,7 @@
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="247.0" prefWidth="571.0">
                                        <children>
-                                          <ButtonBar prefHeight="120.0" prefWidth="573.0" style="-fx-background-color: white;" styleClass="buttonBar" stylesheets="/mainMenu/style.css">
+                                          <ButtonBar prefHeight="120.0" prefWidth="573.0" styleClass="buttonBar, no_color" stylesheets="/mainMenu/style.css">
                                              <buttons>
                                                 <Button fx:id="button1" mnemonicParsing="false" prefHeight="118.0" prefWidth="231.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
                                                 <Button fx:id="button2" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="118.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
@@ -90,7 +90,7 @@
                                                 <Button fx:id="button4" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="119.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
                                              </buttons>
                                           </ButtonBar>
-                                          <ButtonBar layoutY="138.0" prefHeight="111.0" prefWidth="573.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css">
+                                          <ButtonBar layoutY="138.0" prefHeight="111.0" prefWidth="573.0" styleClass="buttonBar, no_color" stylesheets="/mainMenu/style.css">
                                              <buttons>
                                                 <Button fx:id="button6" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="126.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
                                                 <Button fx:id="button8" layoutX="503.0" layoutY="10.0" mnemonicParsing="false" prefHeight="129.0" styleClass="buttonBar" stylesheets="/mainMenu/style.css" />
@@ -125,12 +125,12 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="226.0" prefWidth="550.0" styleClass="AnchorPane" stylesheets="/mainMenu/style.css">
                      <children>
-                        <Button fx:id="normalBotButton" layoutX="117.0" layoutY="177.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="177.0" style="-fx-font-size: 25;" text="Normal Bot">
+                        <Button fx:id="normalBotButton" layoutX="117.0" layoutY="177.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="177.0" style="-fx-font-size: 25;" text="Normal Bot" stylesheets="style.css" styleClass="button_color_yellow">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Button>
-                        <Button fx:id="smartBotButton" layoutX="302.0" layoutY="176.0" mnemonicParsing="false" prefHeight="76.0" prefWidth="170.0" style="-fx-font-size: 25; -fx-font-style: Bold;" text="Smart Bot">
+                        <Button fx:id="smartBotButton" layoutX="302.0" layoutY="176.0" mnemonicParsing="false" prefHeight="76.0" prefWidth="170.0" style="-fx-font-size: 25; -fx-font-style: Bold;" text="Smart Bot" stylesheets="style.css" styleClass="button_color_pink">
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>
@@ -142,7 +142,7 @@
             <Tab fx:id="previousGamesTab" text="history">
                 <content>
                     <AnchorPane prefHeight="226.0" prefWidth="550" styleClass="AnchorPane" stylesheets="/mainMenu/style.css">
-                        <TextArea fx:id="historyTextArea" prefWidth="550.0" prefHeight="226.0">
+                        <TextArea fx:id="historyTextArea" prefWidth="610.0" prefHeight="525.0">
                         </TextArea>
                     </AnchorPane>
                 </content>

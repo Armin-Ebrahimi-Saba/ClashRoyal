@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -277,11 +278,11 @@ public class Server {
                         var usernameAndPassword = line.split(" ");
                         encodedStatus = server.getLoginModel().validateUsernameAndPassword(usernameAndPassword[1], usernameAndPassword[2]);
                         sendRespondMessage(encodedStatus);
-                    } else if (command.contains("PLAY")) {
+                    } else if (command.contains("<PLAY>")) {
                         componentsHandler.sendRespondMessage(line);
-                    } else if (command.contains("PLAY_ALLY")) {
+                    } else if (command.contains("<PLAY_ALLY>")) {
                         mateHandler.sendRespondMessage(command);
-                    } else if (command.contains("PLAY_ENEMY")) {
+                    } else if (command.contains("<PLAY_ENEMY>")) {
                         components[0].sendRespondMessage(command);
                         components[1].sendRespondMessage(command);
                     } else if (command.equalsIgnoreCase("FIND_COMPONENT_1")) {
@@ -315,28 +316,25 @@ public class Server {
                     } else if (command.equalsIgnoreCase("FIND_COMPONENT_2")) {
                         Thread thread = new Thread(() -> {
                             while (true) {
-                                try {
-                                    Thread.sleep(150);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                if (server.getTwoOnTwoWaitingListCache().size() > 1) {
+                                try {Thread.sleep(150);
+                                } catch (InterruptedException e) {e.printStackTrace();}
+                                if(server.getTwoOnTwoWaitingListCache().size() > 1) {
                                     server.getTwoOnTwoWaitingList().add(new ClientHandler[]
                                             {this, mateHandler = server.getTwoOnTwoWaitingListCache().get(0)});
-                                    mateHandler = server.getTwoOnTwoWaitingListCache().get(0);
                                     mateHandler.setMateHandler(this);
+                                    sendRespondMessage("<READY1> " + mateHandler.getEncodedStatus());
                                     server.getTwoOnTwoWaitingListCache().clear();
-                                    sendRespondMessage("<READY> " + mateHandler.getEncodedStatus());
-                                    mateHandler.sendRespondMessage("<READY> " + this.getEncodedStatus());
                                     break;
-                                } else {
-                                    server.getTwoOnTwoWaitingListCache().add(this);
-                                    try {
-                                        Thread.sleep(600);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
+                                } else if(mateHandler == null && !server.getTwoOnTwoWaitingListCache().contains(this)){
+                                    server.getTwoOnTwoWaitingListCache().add(0, this);
                                     sendRespondMessage("<!READY>");
+                                    try {Thread.sleep(600);
+                                    } catch (InterruptedException e) {e.printStackTrace();}
+                                } else if(mateHandler != null){
+                                    sendRespondMessage("<READY1> " + mateHandler.getEncodedStatus());
+                                    try {Thread.sleep(600);
+                                    } catch (InterruptedException e) {e.printStackTrace();}
+                                    break;
                                 }
                             }
                         });
@@ -344,15 +342,21 @@ public class Server {
                         thread.join();
                         Thread thread2 = new Thread(() -> {
                             while (true) {
-                                try {
-                                    Thread.sleep(150);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                                try {Thread.sleep(150);
+                                } catch (InterruptedException e) {e.printStackTrace();}
                                 if (server.getTwoOnTwoWaitingList().size() > 1) {
-                                    components[0].sendRespondMessage("<READY> " + getEncodedStatus());
-                                    components[1].sendRespondMessage("<READY> " + getEncodedStatus());
                                     pairTeams();
+                                    sendRespondMessage("<READY2> " + components[0].getEncodedStatus());
+                                    try {Thread.sleep(300);
+                                    } catch (InterruptedException e) {e.printStackTrace();}
+                                    sendRespondMessage("<READY3> " + components[1].getEncodedStatus());
+                                    break;
+                                } else if (components[0] != null && components[1] != null) {
+                                    sendRespondMessage("<READY2> " + components[0].getEncodedStatus());
+                                    try {Thread.sleep(300);
+                                    } catch (InterruptedException e) {e.printStackTrace();}
+                                    sendRespondMessage("<READY3> " + components[1].getEncodedStatus());
+                                    server.getTwoOnTwoWaitingList().clear();
                                     break;
                                 }
                             }
@@ -360,6 +364,8 @@ public class Server {
                         thread2.start();
                     } else if (command.contains("<SAVE>")) {
                         componentsHandler = null;
+                        components = new ClientHandler[2];
+                        mateHandler = null;
                         String[] commandPartitions = command.split(" ", 2);
                         server.updateDB(commandPartitions[1]);
                     }
@@ -372,10 +378,15 @@ public class Server {
         /**
          * this method pair 2 teams for two on two playing
          */
-        private void pairTeams() {
+        private synchronized void pairTeams() {
             server.getTwoOnTwoWaitingList().forEach((team) -> {
-                if (team[0] != this && team[0] != mateHandler)
+                if (team[0] != this && team[0] != mateHandler) {
+                    System.out.println(Arrays.toString(team));
                     components = team;
+                    mateHandler.setComponentsListHandler(team);
+                    team[0].setComponentsListHandler(new ClientHandler[]{this, mateHandler});
+                    team[1].setComponentsListHandler(new ClientHandler[]{this, mateHandler});
+                }
             });
         }
 
@@ -415,6 +426,15 @@ public class Server {
          */
         public void setComponentsHandler(ClientHandler componentsHandler) {
             this.componentsHandler = componentsHandler;
+        }
+
+        /**
+         * this method is a setter
+         *
+         * @param components is a list of components handlers
+         */
+        public void setComponentsListHandler(ClientHandler[] components) {
+            this.components = components;
         }
 
         /**
