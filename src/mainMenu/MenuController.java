@@ -167,7 +167,7 @@ public class MenuController {
                     Thread thread = new Thread(() -> {
                         while (!(s = client.getLastRespond()).contains("<READY>")) {
                             System.out.println(s);
-                            try {Thread.sleep(150);
+                            try {Thread.sleep(100);
                             } catch (InterruptedException interruptedException) {interruptedException.printStackTrace();}
                         }
                     });

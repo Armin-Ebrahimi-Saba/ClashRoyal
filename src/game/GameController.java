@@ -98,7 +98,7 @@ public class GameController implements EventHandler<MouseEvent> {
             int counter2 = 0;
             while (time > 0) {
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -392,10 +392,10 @@ public class GameController implements EventHandler<MouseEvent> {
             client1.getStatus().addRecord(allyName + "("  + bluePoint + ")" + "   LOST   " + "(" + redPoint + ")" + enemyName);
             client1.getStatus().increaseXP(70);
         } else {
-            if (getTotalHPOfTowers(client1.getStatus()) > getTotalHPOfTowers(players[3].getStatus())) {
+            if (getTotalHPOfTowers(client1.getStatus()) > getTotalHPOfTowers(players[2].getStatus())) {
                 client1.getStatus().addRecord(allyName + "("  + bluePoint + ")" + "   WON   " + "(" + redPoint + ")" + enemyName);
                 client1.getStatus().increaseXP(200);
-            } else if(getTotalHPOfTowers(client1.getStatus()) < getTotalHPOfTowers(players[3].getStatus())) {
+            } else if(getTotalHPOfTowers(client1.getStatus()) < getTotalHPOfTowers(players[2].getStatus())) {
                 client1.getStatus().addRecord(allyName + "("  + bluePoint + ")" + "   LOST   " + "(" + redPoint + ")" + enemyName);
                 client1.getStatus().increaseXP(70);
             } else {

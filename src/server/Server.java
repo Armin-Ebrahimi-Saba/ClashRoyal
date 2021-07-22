@@ -302,13 +302,13 @@ public class Server {
                                     sendRespondMessage("<READY> " + componentsHandler.getEncodedStatus());
                                     break;
                                 } else {
+                                    sendRespondMessage("<!READY>");
+                                    server.getBattleWaitList().add(this);
                                     try {
                                         Thread.sleep(450);
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
-                                    server.getBattleWaitList().add(this);
-                                    sendRespondMessage("<!READY>");
                                 }
                             }
                         });
