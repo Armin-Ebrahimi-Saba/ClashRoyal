@@ -1,3 +1,4 @@
+About 4000 lines of code. This was final project of **Advanced Programming Course**. \
 Features: 
 - Online multiplayer (1v1 and 2v2)
 - Login
