@@ -4,4 +4,4 @@ Features:
 - Register
 - Set card deck
 - 2D characters
-- Almost all features of clash of clans in 2019 apart from ***Beutiful UI, Clans, Chats, and Friends***
+- Almost all features of clash of clans in 2021 apart from ***Beutiful UI, Clans, Chats, and Friends***
