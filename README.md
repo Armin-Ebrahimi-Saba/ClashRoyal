@@ -3,7 +3,7 @@ Features:
 - Online multiplayer (1v1 and 2v2)
 - Login
 - Register
-- Set card deck
+- Custom Card Deck
 - 2D characters
 - Almost all features of clash of clans in 2021 apart from ***Beutiful UI, Clans, Chats, and Friends***
 ![Screenshot 2025-05-28 145644](https://github.com/user-attachments/assets/5835b6bf-f4bd-467e-8f08-ca4d79e2733d)
